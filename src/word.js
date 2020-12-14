@@ -68,9 +68,8 @@ class Word {
         return false;
       }
       const word = parts.join("");
-      if (branch.has(FINISHES_WORD) && this.blacklist.allows(word) /* TODO: and word fits in segment.pattern */) {
-        const { blacklist, segment, tray, trie } = this;
-        return new Word({ blacklist, branch, parts, segment, tray, trie, word });
+      if (branch.has(FINISHES_WORD) && this.blacklist.allows(word) && this.segment.allows(word)) {
+        return new Word({ branch, parts, placement: this, segment: this.segment, word });
       } else {
         return loop(parts.slice(), branch);
       }
