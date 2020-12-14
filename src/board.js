@@ -21,18 +21,19 @@ class Board {
     });
   }
   getNext(placement) {
+    const placementDelta = placement.getDelta();
     const rows = new Map();
-    let newRow = placement.row;
-    let newCol = placement.col;
+    let newRow = placementDelta.row;
+    let newCol = placementDelta.col;
     let numCols = this.numCols;
     let rowsToAdd = 0;
     let colsToAdd = 0;
-    if (placement.row < 0) {
-      rowsToAdd = -placement.row;
+    if (newRow < 0) {
+      rowsToAdd = -newRow;
       newRow = 0;
     }
-    if (placement.col < 0) {
-      colsToAdd = -placement.col;
+    if (newCol < 0) {
+      colsToAdd = -newCol;
       newCol = 0;
     }
     this.rows.forEach((rowCols, rowKey) => {
@@ -45,8 +46,8 @@ class Board {
       });
       rows.set(rowsToAdd + rowKey, cols);
     });
-    if (placement.down) {
-      placement.word.split("").forEach((letter, index) => {
+    if (placementDelta.down) {
+      placementDelta.wordArr.forEach((letter, index) => {
         const newRowPlusIndex = newRow + index;
         if (!rows.has(newRowPlusIndex)) {
           rows.set(newRowPlusIndex, new Map());
@@ -57,7 +58,7 @@ class Board {
       });
     } else {
       const tileRow = rows.get(newRow);
-      placement.word.split("").forEach((letter, index) => {
+      placementDelta.wordArr.split("").forEach((letter, index) => {
         const colPlusIndex = newCol + index;
         const originalValue = tileRow.get(colPlusIndex);
         tileRow.set(colPlusIndex, letter);
