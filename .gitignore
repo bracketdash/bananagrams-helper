@@ -1,14 +1,11 @@
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 .DS_Store
-.pnp.*
-.yarn/*
+.eslintcache
 *.local
-/build
-/node_modules
-npm-debug.log*
+*.log*
+build/
+node_modules/
+
+# Yarn
 
 .yarn/*
 !.yarn/releases
