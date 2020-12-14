@@ -1,8 +1,5 @@
 import { createPlacement } from "./placement";
 
-// Instantiated each time we try a new state in a solve, from 1 to tens of thousands of times per solve
-// Everything from here on down (placement, segment, word) must be very efficient
-
 class State {
   constructor({ board, parent, placement, solve, tray }) {
     this.board = board;

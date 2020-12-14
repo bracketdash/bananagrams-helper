@@ -1,9 +1,6 @@
 import { createBoard } from "./board";
 import { createState } from "./state";
 
-// Instantiated once per solve (each time the user changes the tray or blacklist)
-// Traverses the possible states until a solution is found or we find out no solution is possible
-
 class Solve {
   constructor({ blacklist, solver, tray, update }) {
     this.blacklist = blacklist;

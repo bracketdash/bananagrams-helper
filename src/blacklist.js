@@ -1,5 +1,3 @@
-// Instantiated once per solve (each time the user changes the tray or blacklist)
-
 class Blacklist {
   constructor(blacklistStr) {
     this.words = new Set(blacklistStr.split(/\s*,\s*/));

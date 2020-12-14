@@ -94,9 +94,6 @@ class Word {
     };
     return loop(this.parts.slice() || ["a"], this.branch || this.trie.getData().get("a"));
   }
-  getString() {
-    return this.word;
-  }
   init() {
     const result = this.getNextValidWord();
     if (!result) {

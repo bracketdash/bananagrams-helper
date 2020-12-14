@@ -1,7 +1,3 @@
-// Instantiated:
-// -- once per solve (each time the user changes the tray or blacklist)
-// -- each time we need to get a new version of the tray without placed letters
-
 class Tray {
   constructor(str) {
     this.str = str;

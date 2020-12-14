@@ -1,7 +1,3 @@
-// Instantiated:
-// -- once per solve (each time the user changes the tray or blacklist)
-// -- whenever we make a placement on the board (once per state)
-
 class Board {
   constructor({ numCols, numRows, rows }) {
     this.numCols = numCols || 1;
@@ -53,14 +49,12 @@ class Board {
           rows.set(newRowPlusIndex, new Map());
         }
         const tileRow = rows.get(newRowPlusIndex);
-        const originalValue = tileRow.get(newCol);
         tileRow.set(newCol, letter);
       });
     } else {
       const tileRow = rows.get(newRow);
       placementDelta.wordArr.split("").forEach((letter, index) => {
         const colPlusIndex = newCol + index;
-        const originalValue = tileRow.get(colPlusIndex);
         tileRow.set(colPlusIndex, letter);
       });
     }
