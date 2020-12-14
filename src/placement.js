@@ -3,7 +3,7 @@ import { createWord } from "./word";
 
 class Placement {
   constructor({ index, placement, segment, state, word }) {
-    // TODO: calculate row, col, down, placedTiles, total
+    // TODO: calculate row, col, down, tiles, total
     // TODO: we might need to do the this.init() thing here too
     // TODO: we will need to return `false` from createPlacement if a valid placement can't be made
   }
@@ -36,7 +36,7 @@ class Placement {
     return new Placement({ placement: this, segment, word });
   }
   getPlacedTiles() {
-    return this.placedTiles;
+    return this.tiles;
   }
   getState() {
     return this.state;
