@@ -3,9 +3,15 @@ import { createWord } from "./word";
 
 class Placement {
   constructor({ index, placement, segment, state, word }) {
+    this.index = index;
+    this.placement = placement;
+    this.segment = segment;
+    this.state = state;
+    this.word = word;
+  }
+  init() {
     // TODO: calculate row, col, down, tiles, total
-    // TODO: we might need to do the this.init() thing here too
-    // TODO: we will need to return `false` from createPlacement if a valid placement can't be made
+    // TODO: return false if a placement can't be made
   }
   getDelta() {
     const { col, down, row, word } = this;
@@ -15,11 +21,11 @@ class Placement {
   getNext() {
     const index = this.index ? this.index + 1 : 1;
     if (index < this.total) {
-      return new Placement({ index, placement: this });
+      return createPlacement({ index, placement: this });
     }
     let word = this.word.getNext();
     if (word) {
-      return new Placement({ placement: this, word });
+      return createPlacement({ placement: this, word });
     }
     let segment = this.segment.getNext();
     if (!segment) {
@@ -34,7 +40,7 @@ class Placement {
         return false;
       }
     }
-    return new Placement({ placement: this, segment, word });
+    return createPlacement({ placement: this, segment, word });
   }
   getPlacedTiles() {
     return this.tiles;
@@ -44,16 +50,18 @@ class Placement {
   }
 }
 
-export const createPlacement = ({ state }) => {
-  const segment = createSegment({ board });
+export const createPlacement = ({ index, placement, segment, state, word }) => {
+  segment = segment || createSegment({ state });
   if (!segment) {
     return false;
   }
-  const word = createWord({ segment, state });
+  word = word || createWord({ segment, state });
   if (!word) {
     return false;
   }
-  this.segment = segment;
-  this.word = word;
-  return new Placement({ segment, state, word });
+  const newPlacement = new Placement({ index, placement, segment, state, word });
+  if (!newPlacement.init()) {
+    return false;
+  }
+  return newPlacement;
 };
