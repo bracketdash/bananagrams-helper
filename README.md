@@ -22,6 +22,6 @@ yarn :command
 
 ### TODOs
 
-- `placement.js` - calculate if missing: row, col, down, placedTiles, total
+- `placement.js` - calculate if missing: row, col, down, tiles, total
 - `segment.js` - (not started)
 - `words.js` - fix unsafe references in loop
