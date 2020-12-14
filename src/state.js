@@ -4,26 +4,23 @@ import { createPlacement } from "./placement";
 // Everything from here on down (placement, segment, word) must be very efficient
 
 class State {
-  constructor({ blacklist, board, parent, placement, tray, trie }) {
-    this.blacklist = blacklist;
+  constructor({ board, parent, placement, solve, tray }) {
     this.board = board;
     this.parent = parent;
     this.placement = placement;
-    this.tray = tray;
-    this.trie = trie;
+    this.solve = solve;
+    this.tray = tray || solve.getTray();
   }
   getAdvanced() {
-    const { blacklist, tray, trie } = this;
-    const placement = createPlacement({ blacklist, board: this.board, tray, trie });
+    const placement = createPlacement({ state: this });
     if (!placement) {
       return false;
     }
     return new State({
-      blacklist,
       board: this.board.getNext(placement),
       parent: this,
       placement,
-      tray: tray.getNext(placement.getPlacedTiles()),
+      tray: this.tray.getNext(placement.getPlacedTiles()),
     });
   }
   getBoard() {
@@ -52,6 +49,9 @@ class State {
   }
   getPrev() {
     return this.previous;
+  }
+  getSolve() {
+    return this.solve;
   }
   getTray() {
     return this.tray;

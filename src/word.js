@@ -1,13 +1,20 @@
 import { BRANCHES_KEY, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 
 class Word {
-  constructor({ blacklist, branch, parts, segment, tray, trie, word }) {
-    this.blacklist = blacklist;
+  constructor({ branch, parts, placement, segment, state, word }) {
+    let solve;
+    if (state) {
+      solve = state.getSolve();
+    } else {
+      state = placement.getState();
+      solve = state.getSolve();
+    }
+    this.blacklist = solve.getBlacklist();
     this.branch = branch;
     this.parts = parts;
     this.segment = segment;
-    this.tray = tray;
-    this.trie = trie;
+    this.tray = state.getTray();
+    this.trie = solve.getSolver().getTrie();
     this.word = word;
   }
   getNext() {
@@ -15,14 +22,12 @@ class Word {
     if (!result) {
       return false;
     }
-    const { blacklist, segment, tray, trie } = this;
     return new Word({
-      blacklist,
       branch: result.branch,
       parts: result.parts,
-      segment,
-      tray,
-      trie,
+      placement: this.placement,
+      segment: this.segment,
+      state: this.state,
       word: result.word,
     });
   }
@@ -100,8 +105,8 @@ class Word {
   }
 }
 
-export const createWord = ({ blacklist, segment, tray, trie }) => {
-  const word = new Word({ blacklist, segment, tray, trie });
+export const createWord = ({ placement, segment, state }) => {
+  const word = new Word({ placement, segment, state });
   if (!word.init()) {
     return false;
   }
