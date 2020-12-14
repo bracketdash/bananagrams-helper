@@ -40,23 +40,10 @@ class Word {
   }
   getNextValidWord() {
     const loop = (parts, branch) => {
-      if (branch.has(BRANCHES_KEY)) {
-        branch.get(BRANCHES_KEY).some((childBranch, part) => {
-          if (this.partMeetsCriteria(part)) {
-            parts.push(part);
-            branch = childBranch;
-            return true;
-          }
-          return false;
-        });
-      } else if (branch.has(PARENT_BRANCH)) {
-        let gotABranch = false;
-        let lastPart = false;
-        while (gotABranch === false) {
-          branch = branch.get(PARENT_BRANCH);
-          lastPart = parts.pop();
-          // TODO: fix unsafe references to variable(s) in loop -- see VS Code eslint error
-          gotABranch = branch.get(BRANCHES_KEY).some((childBranch, part) => {
+      const inception = (branch, parts) => {
+        let lastPart = parts.pop();
+        if (
+          !branch.get(BRANCHES_KEY).some((childBranch, part) => {
             if (lastPart) {
               if (lastPart === part) {
                 lastPart = false;
@@ -69,8 +56,32 @@ class Word {
               return true;
             }
             return false;
-          });
+          })
+        ) {
+          if (branch.has(PARENT_BRANCH)) {
+            return inception(branch.get(PARENT_BRANCH), parts);
+          } else {
+            return false;
+          }
         }
+        return { branch, parts };
+      };
+      if (branch.has(BRANCHES_KEY)) {
+        branch.get(BRANCHES_KEY).some((childBranch, part) => {
+          if (this.partMeetsCriteria(part)) {
+            parts.push(part);
+            branch = childBranch;
+            return true;
+          }
+          return false;
+        });
+      } else if (branch.has(PARENT_BRANCH)) {
+        const result = inception(branch.get(PARENT_BRANCH), parts);
+        if (!result) {
+          return false;
+        }
+        branch = result.branch;
+        parts = result.parts;
       } else {
         return false;
       }
