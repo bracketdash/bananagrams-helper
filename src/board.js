@@ -21,11 +21,10 @@ class Board {
     });
   }
   getNext(placement) {
-    // TODO: clean up / debug this
     const rows = new Map();
     let newRow = placement.row;
     let newCol = placement.col;
-    let newColumns = this.numCols;
+    let numCols = this.numCols;
     let rowsToAdd = 0;
     let colsToAdd = 0;
     if (placement.row < 0) {
@@ -35,11 +34,13 @@ class Board {
     if (placement.col < 0) {
       colsToAdd = -placement.col;
       newCol = 0;
-      newColumns += colsToAdd;
     }
     this.rows.forEach((rowCols, rowKey) => {
       const cols = new Map();
       rowCols.forEach((col, colKey) => {
+        if (colsToAdd + colKey + 1 > numCols) {
+          numCols = colsToAdd + colKey + 1;
+        }
         cols.set(colsToAdd + colKey, col);
       });
       rows.set(rowsToAdd + rowKey, cols);
@@ -52,22 +53,16 @@ class Board {
         }
         const tileRow = rows.get(newRowPlusIndex);
         const originalValue = tileRow.get(newCol);
-        if (!originalValue) {
-          tileRow.set(newCol, letter);
-        }
+        tileRow.set(newCol, letter);
       });
     } else {
       const tileRow = rows.get(newRow);
       placement.word.split("").forEach((letter, index) => {
         const colPlusIndex = newCol + index;
         const originalValue = tileRow.get(colPlusIndex);
-        if (!originalValue) {
-          tileRow.set(colPlusIndex, letter);
-        }
+        tileRow.set(colPlusIndex, letter);
       });
     }
-    // TODO: get numCols, numRows
-    let numCols = 1;
     const numRows = Math.max(...rows.keys()) + 1;
     return new Board({ numCols, numRows, rows });
   }
