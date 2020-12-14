@@ -24,3 +24,4 @@ yarn :command
 
 - `placement.js` - calculate if missing: row, col, down, placedTiles, total
 - `segment.js` - (not started)
+- `words.js` - (2) fix unsafe references; if word fits in segment
