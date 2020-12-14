@@ -48,6 +48,7 @@ class Word {
         while (gotABranch === false) {
           branch = branch.get(PARENT_BRANCH);
           lastPart = parts.pop();
+          // TODO: fix unsafe references to variable(s) in loop -- see VS Code eslint error
           gotABranch = branch.get(BRANCHES_KEY).some((childBranch, part) => {
             if (lastPart) {
               if (lastPart === part) {
@@ -67,7 +68,7 @@ class Word {
         return false;
       }
       const word = parts.join("");
-      if (branch.has(FINISHES_WORD) && this.blacklist.allows(word)) {
+      if (branch.has(FINISHES_WORD) && this.blacklist.allows(word) /* TODO: and word fits in segment.pattern */) {
         const { blacklist, segment, tray, trie } = this;
         return new Word({ blacklist, branch, parts, segment, tray, trie, word });
       } else {
