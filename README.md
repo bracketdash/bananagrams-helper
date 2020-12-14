@@ -22,6 +22,5 @@ yarn :command
 
 ### TODOs
 
-- `board.js` - apply the placement
 - `placement.js` - calculate if missing: row, col, down, placedTiles, total
 - `segment.js` - (not started)
