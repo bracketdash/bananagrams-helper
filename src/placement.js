@@ -9,7 +9,8 @@ class Placement {
   }
   getDelta() {
     const { col, down, row, word } = this;
-    return { col, down, row, word };
+    const wordArr = word.getArray();
+    return { col, down, row, wordArr };
   }
   getNext() {
     const index = this.index ? this.index + 1 : 1;
