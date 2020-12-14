@@ -16,6 +16,13 @@ class Word {
     this.tray = state.getTray();
     this.trie = solve.getSolver().getTrie();
     this.word = word;
+    this.wordArr = word ? word.split("") : [];
+  }
+  getArray() {
+    if (!this.wordArr.length) {
+      this.wordArr = this.word.split("");
+    }
+    return this.wordArr;
   }
   getNext() {
     const result = this.getNextValidWord();
@@ -87,6 +94,7 @@ class Word {
     this.branch = result.branch;
     this.parts = result.parts;
     this.word = result.word;
+    this.wordArr = result.word.split("");
   }
   partMeetsCriteria(part) {
     const counts = this.tray.getCountsWith(this.segment);
