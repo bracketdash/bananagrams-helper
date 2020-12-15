@@ -20,17 +20,17 @@ class Placement {
     const wordStr = word.getString();
     
     // TODO
+    let index = 0;
+    let lastIndex = 0;
     let valid = true;
     while (valid) {
-      // wordStr.search(pattern) to get the index of
-      // the first tile in the first occurence of the segment within the word
-      // (in a loop):
-      // wordStr.slice(index found previously).search(pattern) for the index (within the word slice!) of
-      // the first tile in the next occurence of the segment within the word
-      // for each placement candidate, only add it to this.placements if it would not create any invalid perpindicular words
+      index = wordStr.slice(index).search(pattern);
+      // down ? row += index : col += index;
+      // only push to this.placements if it would not create any invalid perpindicular words
       // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
       if (valid) {
         placements.push({ col, down, row, wordArr });
+        index = lastIndex + index;
       }
     }
     
