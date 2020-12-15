@@ -22,5 +22,5 @@ yarn :command
 
 ### TODOs
 
-- `placement.js` - calculate row, col, down, tiles, total
+- `placement.js` - init()
 - `segment.js` - (not started)
