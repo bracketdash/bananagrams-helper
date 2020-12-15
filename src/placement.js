@@ -31,32 +31,29 @@ class Placement {
     const placements = this.placements;
     const state = this.state;
     if (index < this.placements.length) {
-      return createPlacement({ index, placements, segment: this.segment, state, word: this.word });
+      return new Placement({ index, placements, segment: this.segment, state, word: this.word });
     }
     let word = this.word.getNext();
     if (word) {
-      return createPlacement({ index, placements, segment: this.segment, state, word });
+      return new Placement({ index, placements, segment: this.segment, state, word });
     }
     let segment = this.segment.getNext();
     if (!segment) {
       return false;
     }
-    word = createPlacement({ index, placements, segment, state, word });
+    word = createWord({ segment, state: this.state });
     while (!word) {
       segment = segment.getNext();
       if (segment) {
-        word = createPlacement({ index, placements, segment, state, word });
+        word = createWord({ segment, state: this.state });
       } else {
         return false;
       }
     }
-    return createPlacement({ index, placements, segment, state, word });
+    return new Placement({ index, placements, segment, state, word });
   }
   getPlacedTiles() {
     return this.tiles;
-  }
-  getState() {
-    return this.state;
   }
 }
 
