@@ -14,9 +14,40 @@ class Placement {
       return true;
     }
     const placements = [];
+    const { col, down, pattern, perps, row } = this.segment.getData();
     // TODO: get the possible placements of the word within the segment
     // TODO: do not add placement if any of the placed tiles would create invalid perpindicular words
-    // TODO: for each valid placement: this.placements.push({ col, down, row, wordArr })
+    /*
+    const firstPosition = -(word.length - 1);
+    const wordLetters = word.split("");
+    [...Array(word.length * 2 + tiles.length - 4).keys()].forEach((index) => {
+      const pos = firstPosition + index;
+      let overlap = false;
+      let valid = true;
+      wordLetters.forEach((letter, letterIndex) => {
+        if (!valid) {
+          return;
+        }
+        if (tiles[pos + letterIndex] !== " ") {
+          if (tiles[pos + letterIndex] !== letter) {
+            valid = false;
+          } else if (!overlap) {
+            overlap = true;
+          }
+        }
+      });
+      if (!valid || !overlap) {
+        return;
+      }
+      let rowAdd = 0;
+      let colAdd = 0;
+      if (down) {
+        rowAdd = pos;
+      } else {
+        colAdd = pos;
+      }
+      placements.push(placement); // should be { col, down, row, wordArr }
+    */
     if (!placements.length) {
       return false;
     }
