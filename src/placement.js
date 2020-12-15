@@ -12,7 +12,7 @@ class Placement {
   init() {
     // TODO: if this.placements doesn't exist, get the possible placements of the word within the segment
     // TODO: --> this.placements.push({ col, down, row, wordArr })
-    // TODO: return false if a placement can't be made
+    // TODO: return false if a placement can't be made (i.e. at least one placed tile would create invalid perpendicular words)
   }
   getDelta() {
     return this.placements[this.index];
