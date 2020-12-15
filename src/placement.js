@@ -13,20 +13,26 @@ class Placement {
     if (this.placements) {
       return true;
     }
-    const { col, down, pattern, perps, row } = this.segment.getData();
+    const { down, pattern, perps } = this.segment.getData();
+    let { col, row } = this.segment.getData();
     const placements = [];
     const wordArr = word.getArray();
     const wordStr = word.getString();
     
     // TODO
-    // wordStr.search(pattern) to get the index of
-    // the first tile in the first occurence of the segment within the word
-    // (in a loop):
-    // wordStr.slice(index found previously).search(pattern) for the index (within the word slice!) of
-    // the first tile in the next occurence of the segment within the word
-    // for each placement candidate, only add it to this.placements if it would not create any invalid perpindicular words
-    // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
-    // placements.push({ col, down, row, wordArr });
+    let valid = true;
+    while (valid) {
+      // wordStr.search(pattern) to get the index of
+      // the first tile in the first occurence of the segment within the word
+      // (in a loop):
+      // wordStr.slice(index found previously).search(pattern) for the index (within the word slice!) of
+      // the first tile in the next occurence of the segment within the word
+      // for each placement candidate, only add it to this.placements if it would not create any invalid perpindicular words
+      // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
+      if (valid) {
+        placements.push({ col, down, row, wordArr });
+      }
+    }
     
     if (!placements.length) {
       return false;
