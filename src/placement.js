@@ -2,45 +2,46 @@ import { createSegment } from "./segment";
 import { createWord } from "./word";
 
 class Placement {
-  constructor({ index, placement, segment, state, word }) {
+  constructor({ index, placements, segment, state, word }) {
     this.index = index;
-    this.placement = placement;
+    this.placements = placements;
     this.segment = segment;
     this.state = state;
     this.word = word;
   }
   init() {
-    // TODO: calculate row, col, down, tiles, total
+    // TODO: if this.placements doesn't exist, get the possible placements of the word within the segment
+    // TODO: --> this.placements.push({ col, down, row, wordArr })
     // TODO: return false if a placement can't be made
   }
   getDelta() {
-    const { col, down, row, word } = this;
-    const wordArr = word.getArray();
-    return { col, down, row, wordArr };
+    return this.placements[this.index];
   }
   getNext() {
     const index = this.index ? this.index + 1 : 1;
-    if (index < this.total) {
-      return createPlacement({ index, placement: this });
+    const placements = this.placements;
+    const state = this.state;
+    if (index < this.placements.length) {
+      return createPlacement({ index, placements, segment: this.segment, state, word: this.word });
     }
     let word = this.word.getNext();
     if (word) {
-      return createPlacement({ placement: this, word });
+      return createPlacement({ index, placements, segment: this.segment, state, word });
     }
     let segment = this.segment.getNext();
     if (!segment) {
       return false;
     }
-    word = createWord({ placement: this, segment });
+    word = createPlacement({ index, placements, segment, state, word });
     while (!word) {
       segment = segment.getNext();
       if (segment) {
-        word = createWord({ placement: this, segment });
+        word = createPlacement({ index, placements, segment, state, word });
       } else {
         return false;
       }
     }
-    return createPlacement({ placement: this, segment, word });
+    return createPlacement({ index, placements, segment, state, word });
   }
   getPlacedTiles() {
     return this.tiles;
@@ -50,7 +51,7 @@ class Placement {
   }
 }
 
-export const createPlacement = ({ index, placement, segment, state, word }) => {
+export const createPlacement = ({ index, placements, segment, state, word }) => {
   segment = segment || createSegment({ state });
   if (!segment) {
     return false;
@@ -59,7 +60,7 @@ export const createPlacement = ({ index, placement, segment, state, word }) => {
   if (!word) {
     return false;
   }
-  const newPlacement = new Placement({ index, placement, segment, state, word });
+  const newPlacement = new Placement({ index, placements, segment, state, word });
   if (!newPlacement.init()) {
     return false;
   }
