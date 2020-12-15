@@ -13,21 +13,26 @@ class Placement {
     if (this.placements) {
       return true;
     }
-    const placements = [];
     const { col, down, pattern, perps, row } = this.segment.getData();
-    // TODO: get the possible placements of the word within the segment
-    // TODO: do not add placement if any of the placed tiles would create invalid perpindicular words
-    /*
-    const firstPosition = -(word.length - 1);
-    const wordLetters = word.split("");
-    [...Array(word.length * 2 + tiles.length - 4).keys()].forEach((index) => {
+    const firstPosition = -(wordArr.length - 1);
+    const placements = [];
+    const wordArr = word.getArray();
+    
+    // TODO: finish rewrite below
+    
+    // Approach A
+    
+    // TODO: try and get the indexes of where the word matches up to the segment's pattern
+    
+    // Approach B
+    
+    [...Array(wordArr.length * 2 + tiles.length - 4).keys()].forEach((index) => {
       const pos = firstPosition + index;
-      let overlap = false;
-      let valid = true;
-      wordLetters.forEach((letter, letterIndex) => {
-        if (!valid) {
-          return;
-        }
+      if (wordArr.some((letter, letterIndex) => {
+        
+        // TODO: return true if it would create an invalid perpindicular word
+        // TODO: return false if it would create an invalid perpindicular word
+        
         if (tiles[pos + letterIndex] !== " ") {
           if (tiles[pos + letterIndex] !== letter) {
             valid = false;
@@ -35,8 +40,7 @@ class Placement {
             overlap = true;
           }
         }
-      });
-      if (!valid || !overlap) {
+      })) {
         return;
       }
       let rowAdd = 0;
@@ -46,8 +50,13 @@ class Placement {
       } else {
         colAdd = pos;
       }
-      placements.push(placement); // should be { col, down, row, wordArr }
-    */
+      
+      // TODO: do not add placement if any of the placed tiles would create invalid perpindicular words
+      placements.push(placement);
+      
+      // TODO: finish rewrite above
+      
+    });
     if (!placements.length) {
       return false;
     }
