@@ -10,9 +10,18 @@ class Placement {
     this.word = word;
   }
   init() {
-    // TODO: if this.placements doesn't exist, get the possible placements of the word within the segment
-    // TODO: --> this.placements.push({ col, down, row, wordArr })
-    // TODO: return false if a placement can't be made (i.e. at least one placed tile would create invalid perpendicular words)
+    if (this.placements) {
+      return true;
+    }
+    const placements = [];
+    // TODO: get the possible placements of the word within the segment
+    // TODO: do not add placement if any of the placed tiles would create invalid perpindicular words
+    // TODO: for each valid placement: this.placements.push({ col, down, row, wordArr })
+    if (!placements.length) {
+      return false;
+    }
+    this.placements = placements;
+    return true;
   }
   getDelta() {
     return this.placements[this.index];
