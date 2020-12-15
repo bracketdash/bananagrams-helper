@@ -14,26 +14,32 @@ class Placement {
       return true;
     }
     const { down, pattern, perps } = this.segment.getData();
-    let { col, row } = this.segment.getData();
     const placements = [];
     const wordArr = word.getArray();
     const wordStr = word.getString();
-    
-    // TODO
+    let { col, row } = this.segment.getData();
     let index = 0;
     let lastIndex = 0;
-    let valid = true;
-    while (valid) {
+    let start;
+    while (index > -1) {
       index = wordStr.slice(index).search(pattern);
-      // down ? row += index : col += index;
-      // only push to this.placements if it would not create any invalid perpindicular words
-      // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
-      if (valid) {
-        placements.push({ col, down, row, wordArr });
+      // TODO: figure out where the word would start (set `start`)
+      if (wordArr.some((letter, letterIndex) => {
+        // TODO:
+        // use `start` in conjunction with `letterIndex`
+        // return true if it would create an invalid perpindicular word
+        // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
+      })) {
         index = lastIndex + index;
+        continue;
+      } else if (down) {
+        col = col + start;
+      } else {
+        row = row + start;
       }
+      // TODO: placements.push({ col, down, row, wordArr });
+      index = lastIndex + index;
     }
-    
     if (!placements.length) {
       return false;
     }
