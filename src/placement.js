@@ -14,49 +14,31 @@ class Placement {
       return true;
     }
     const { col, down, pattern, perps, row } = this.segment.getData();
-    const firstPosition = -(wordArr.length - 1);
+    
+    // TODO
+    // Expected data:
+    // col: number of columns from the left until the segment starts
+    // down: true if the segment is part of a column, false if part of a row
+    // pattern: the regex pattern representing the segment
+    // perps: a map of rows/columns (depends on `down`) and adjacent tile info
+    // row: number of rows from the top until the segment starts
+    
+    // perps example:
+    // [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
+    
     const placements = [];
     const wordArr = word.getArray();
+    const wordStr = word.getString();
     
-    // TODO: finish rewrite below
+    // TODO
+    // remove the wildcards from the left and right edges of the pattern
+    // wordStr.search(the trimmed pattern) to get the index of
+    // the first tile in the first occurence of the segment within the word
+    // (in a loop):
+    // wordStr.slice(index found above).search(trimmed pattern) for the index (within the word slice!) of
+    // the first tile in the next occurence of the segment within the word
+    // for each placement candidate, only add it to this.placements if it would not create any invalid perpindicular words
     
-    // Approach A
-    
-    // TODO: try and get the indexes of where the word matches up to the segment's pattern
-    
-    // Approach B
-    
-    [...Array(wordArr.length * 2 + tiles.length - 4).keys()].forEach((index) => {
-      const pos = firstPosition + index;
-      if (wordArr.some((letter, letterIndex) => {
-        
-        // TODO: return true if it would create an invalid perpindicular word
-        // TODO: return false if it would create an invalid perpindicular word
-        
-        if (tiles[pos + letterIndex] !== " ") {
-          if (tiles[pos + letterIndex] !== letter) {
-            valid = false;
-          } else if (!overlap) {
-            overlap = true;
-          }
-        }
-      })) {
-        return;
-      }
-      let rowAdd = 0;
-      let colAdd = 0;
-      if (down) {
-        rowAdd = pos;
-      } else {
-        colAdd = pos;
-      }
-      
-      // TODO: do not add placement if any of the placed tiles would create invalid perpindicular words
-      placements.push(placement);
-      
-      // TODO: finish rewrite above
-      
-    });
     if (!placements.length) {
       return false;
     }
