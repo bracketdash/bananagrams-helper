@@ -16,6 +16,12 @@ class Board {
       return columns;
     });
   }
+  getDimensions() {
+    return {
+      cols: this.numCols,
+      rows: this.numRows,
+    };
+  }
   getNext(placement) {
     const placementDelta = placement.getDelta();
     const rows = new Map();

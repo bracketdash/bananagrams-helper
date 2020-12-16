@@ -22,6 +22,7 @@ class Segment {
   }
   init() {
     const board = this.state.getBoard();
+    const dimensions = board.getDimensions();
     const segments = [];
     // TODO: for each row and column: get tiles
     // TODO: then create one segment for each pattern we can make from them
