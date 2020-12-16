@@ -22,7 +22,9 @@ class Segment {
   }
   init() {
     const board = this.state.getBoard();
-    // TODO: set this.index, this.segments [{ col, counts, down, pattern, perps, row }]
+    const segments = [];
+    // TODO: for each row and column: get tiles
+    // TODO: then create one segment for each pattern we can make from them
     /*
     getPatterns(tiles) {
       const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
@@ -82,6 +84,12 @@ class Segment {
       });
     }
     */
+    // TODO: segments.push({ col, counts, down, pattern, perps, row });
+    if (!segments.length) {
+      return false;
+    }
+    this.index = 0;
+    this.segments = segments;
   }
 }
 
