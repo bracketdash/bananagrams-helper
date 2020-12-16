@@ -14,7 +14,11 @@ class Segment {
     return this.segments[this.index];
   }
   getNext() {
-    // TODO: return new Segment({ index, segments, state: this.state });
+    const { index, segments, state } = this;
+    if (index === segments.length - 1) {
+      return false;
+    }
+    return new Segment({ index: index + 1, segments, state });
   }
   init() {
     const board = this.state.getBoard();
