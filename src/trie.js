@@ -31,6 +31,12 @@ const decode = (code) => {
 };
 
 class Trie {
+  contains(word) {
+    const loop = (trie, str) => {
+      // loop(trie[..], str (without trie part));
+    };
+    return loop(this.data, word);
+  }
   getData() {
     return this.data;
   }
