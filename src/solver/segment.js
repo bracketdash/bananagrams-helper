@@ -21,11 +21,23 @@ class Segment {
     return new Segment({ index: index + 1, segments, state });
   }
   init() {
-    const board = this.state.getBoard();
-    const dimensions = board.getDimensions();
     const segments = [];
-    // TODO: for each row and column: get tiles
-    // TODO: then create one segment for each pattern we can make from them
+    let columns = [];
+    const rows = this.state.getBoard().getArray().map((cols, row) => {
+      cols.forEach((cell, col) => {
+        if (!columns[col]) {
+          columns.push("");
+        }
+        columns[col] += cell;
+      });
+      return cols.join("");
+    });
+    rows.forEach((rowStr, rowIndex) => {
+      // TODO: get tiles, then create one segment for each pattern we can make from them
+    });
+    columns.forEach((colStr, colIndex) => {
+      // TODO: get tiles, then create one segment for each pattern we can make from them
+    });
     /*
     getPatterns(tiles) {
       const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
