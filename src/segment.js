@@ -62,6 +62,15 @@ class Segment {
   constructor({ board }) {
     this.board = board;
   }
+  allows() {
+    // TODO
+  }
+  getCounts() {
+    // TODO
+  }
+  getData() {
+    // TODO
+  }
   getNext() {
     // TODO
   }
