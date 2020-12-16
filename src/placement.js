@@ -7,12 +7,10 @@ class Placement {
     this.placements = placements;
     this.segment = segment;
     this.state = state;
+    this.trie = state.getSolve().getSolver().getTrie();
     this.word = word;
   }
   init() {
-    if (this.placements) {
-      return true;
-    }
     const { down, pattern, perps } = this.segment.getData();
     const placements = [];
     const wordArr = word.getArray();
@@ -25,10 +23,14 @@ class Placement {
       index = wordStr.slice(index).search(pattern);
       // TODO: figure out where the word would start (set `start`)
       if (wordArr.some((letter, letterIndex) => {
-        // TODO:
-        // use `start` in conjunction with `letterIndex`
-        // return true if it would create an invalid perpindicular word
-        // perps example: [(3, {left: "ad", right: "l"}), (5, {right: "art"})]
+        // TODO: const perpIndex = use `start` in conjunction with `letterIndex`
+        if (perps.has(perpIndex)) {
+          const { left, right } = perps.get(perpIndex);
+          if (!this.trie.contains(`${left || ""}${letter}${right || ""}`)) {
+            return true;
+          }
+        }
+        return false;
       })) {
         index = lastIndex + index;
         continue;
@@ -37,7 +39,7 @@ class Placement {
       } else {
         row = row + start;
       }
-      // TODO: placements.push({ col, down, row, wordArr });
+      placements.push({ col, down, row, wordArr });
       index = lastIndex + index;
     }
     if (!placements.length) {
