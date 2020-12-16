@@ -19,8 +19,3 @@ See [./package.json](./package.json) for available Yarn commands.
 ```
 yarn :command
 ```
-
-### TODOs
-
-- `placement.js` - init()
-- `segment.js` - (not started)

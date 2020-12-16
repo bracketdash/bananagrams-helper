@@ -21,17 +21,19 @@ class Placement {
     let start;
     while (index > -1) {
       index = wordStr.slice(index).search(pattern);
-      // TODO: figure out where the word would start (set `start`)
-      if (wordArr.some((letter, letterIndex) => {
-        // TODO: const perpIndex = use `start` in conjunction with `letterIndex`
-        if (perps.has(perpIndex)) {
-          const { left, right } = perps.get(perpIndex);
-          if (!this.trie.contains(`${left || ""}${letter}${right || ""}`)) {
-            return true;
+      start = (down ? row : col) - index;
+      if (
+        wordArr.some((letter, letterIndex) => {
+          const perpIndex = start + letterIndex;
+          if (perps.has(perpIndex)) {
+            const { left, right } = perps.get(perpIndex);
+            if (!this.trie.contains(`${left || ""}${letter}${right || ""}`)) {
+              return true;
+            }
           }
-        }
-        return false;
-      })) {
+          return false;
+        })
+      ) {
         index = lastIndex + index;
         continue;
       } else if (down) {
