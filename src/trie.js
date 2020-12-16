@@ -33,7 +33,20 @@ const decode = (code) => {
 class Trie {
   contains(word) {
     const loop = (trie, str) => {
-      // loop(trie[..], str (without trie part));
+      if ([...trie.keys()].some((part) => {
+        if (str.startsWith(part)) {
+          str = str.replace(part, "");
+          trie = trie.get(str);
+          return true;
+        }
+        return false;
+      })) {
+        if (trie.has(FINISHES_WORD)) {
+          return true;
+        }
+        return loop(trie, str);
+      }
+      return false;
     };
     return loop(this.data, word);
   }
