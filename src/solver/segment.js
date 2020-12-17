@@ -1,5 +1,4 @@
 const getPatterns = (tiles) => {
-  // TODO: tiles: trim left except first space and right except last space
   const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
   const moddedPatternTest = /[a-z]+[^a-z]+[a-z]+/;
   const loop = (fullPattern, patterns, leftTrim, rightTrim) => {
@@ -88,13 +87,17 @@ class Segment {
       return cols.join("");
     });
     rows.forEach((rowStr, rowIndex) => {
-      getPatterns(rowStr).forEach((pattern) => {
-        // TODO: segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
+      getPatterns(rowStr.trim()).forEach((pattern) => {
+        const perps = [];
+        // TODO: col, counts, perps
+        segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
       });
     });
     columns.forEach((colStr, colIndex) => {
-      getPatterns(colStr).forEach((pattern) => {
-        // TODO: segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
+      getPatterns(colStr.trim()).forEach((pattern) => {
+        const perps = [];
+        // TODO: counts, perps, row
+        segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
       });
     });
     if (!segments.length) {
