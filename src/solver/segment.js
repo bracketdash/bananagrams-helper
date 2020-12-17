@@ -95,20 +95,23 @@ class Segment {
       const trimmedLeft = str.trimLeft();
       const trimmed = trimmedLeft.trimRight();
       const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+      const perps = new Map();
       const start = str.length - trimmedLeft.length;
-      const strArr = Array(str.length).keys();
+      Array(str.length)
+        .keys()
+        .forEach((perpIndex) => {
+          // TODO: left, right
+          if (!left && !right) {
+            return;
+          }
+          perps.set(perpIndex, { left, right });
+        });
+      const startingSegment = { counts, down, pattern, perps };
       getPatterns(trimmed).forEach((pattern) => {
-        const perps = new Map();
         if (down) {
-          strArr.forEach((row) => {
-            // TODO: perps.set(row, { left, right });
-          });
-          segments.push({ col: index, counts, down, pattern, perps, row: start });
+          segments.push(Object.assign({ col: index, row: start }, startingSegment));
         } else {
-          strArr.forEach((col) => {
-            // TODO: perps.set(col, { left, right });
-          });
-          segments.push({ col: start, counts, down, pattern, perps, row: index });
+          segments.push(Object.assign({ col: start, row: index }, startingSegment));
         }
       });
     };
@@ -116,7 +119,7 @@ class Segment {
       produceSegments(rowStr, rowIndex, false);
     });
     columns.forEach((colStr, colIndex) => {
-      produceSegments(rowStr, rowIndex, true);
+      produceSegments(colStr, colIndex, true);
     });
     if (!segments.length) {
       return false;
