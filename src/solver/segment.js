@@ -96,7 +96,6 @@ class Segment {
       const trimmed = trimmedLeft.trimRight();
       const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
       const perps = new Map();
-      const start = str.length - trimmedLeft.length;
       Array(str.length)
         .keys()
         .forEach((perpIndex) => {
@@ -108,6 +107,7 @@ class Segment {
         });
       const startingSegment = { counts, down, pattern, perps };
       getPatterns(trimmed).forEach((pattern) => {
+        // TODO: const start = str.length - trimmedLeft.length; <-- not correct
         if (down) {
           segments.push(Object.assign({ col: index, row: start }, startingSegment));
         } else {
