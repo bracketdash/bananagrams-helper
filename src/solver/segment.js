@@ -77,8 +77,22 @@ class Segment {
     return new Segment({ index: index + 1, segments, state });
   }
   init() {
-    const segments = [];
-    let columns = [];
+    const columns = [];
+    const produceSegments = (str, index, baseSegment) => {
+      const trimmed = str.trim();
+      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+      getPatterns(trimmed).forEach((pattern) => {
+        const perps = [];
+        const segment = Object.assign({}, baseSegment);
+        if (segment.down) {
+          // TODO: perps, row
+          segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
+        } else {
+          // TODO: col, perps
+          segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
+        }
+      });
+    };
     const rows = this.state.getBoard().getArray().map((cols, row) => {
       cols.forEach((cell, col) => {
         if (!columns[col]) {
@@ -88,24 +102,12 @@ class Segment {
       });
       return cols.join("");
     });
-    // TODO: keep things DRY below
+    const segments = [];
     rows.forEach((rowStr, rowIndex) => {
-      const trimmed = rowStr.trim();
-      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
-      getPatterns(trimmed).forEach((pattern) => {
-        const perps = [];
-        // TODO: col, perps
-        segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
-      });
+      produceSegments(rowStr, rowIndex, { down: false, pattern, row: rowIndex });
     });
     columns.forEach((colStr, colIndex) => {
-      const trimmed = rowStr.trim();
-      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
-      getPatterns(trimmed).forEach((pattern) => {
-        const perps = [];
-        // TODO: perps, row
-        segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
-      });
+      produceSegments(rowStr, rowIndex, { col: colIndex, down: true, pattern });
     });
     if (!segments.length) {
       return false;
