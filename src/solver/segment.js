@@ -87,12 +87,15 @@ class Segment {
       return cols.join("");
     });
     rows.forEach((rowStr, rowIndex) => {
-      // TODO: get tiles, then create one segment for each pattern we can make from them
+      getPatterns(rowStr).forEach((pattern) => {
+        // TODO: segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
+      });
     });
     columns.forEach((colStr, colIndex) => {
-      // TODO: get tiles, then create one segment for each pattern we can make from them
+      getPatterns(colStr).forEach((pattern) => {
+        // TODO: segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
+      });
     });
-    // TODO: segments.push({ col, counts, down, pattern, perps, row });
     if (!segments.length) {
       return false;
     }
