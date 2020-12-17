@@ -1,10 +1,9 @@
+import { getLetterCounts } from "./utilities";
+
 class Tray {
   constructor(str) {
     this.str = str;
-    this.counts = str.split("").reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map());
+    this.counts = getLetterCounts(str);
   }
   getCountsWith(segment) {
     const counts = new Map();

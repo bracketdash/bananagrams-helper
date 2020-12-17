@@ -1,3 +1,5 @@
+import { getLetterCounts } from "./utilities";
+
 const getPatterns = (tiles) => {
   const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
   const moddedPatternTest = /[a-z]+[^a-z]+[a-z]+/;
@@ -86,17 +88,22 @@ class Segment {
       });
       return cols.join("");
     });
+    // TODO: keep things DRY below
     rows.forEach((rowStr, rowIndex) => {
-      getPatterns(rowStr.trim()).forEach((pattern) => {
+      const trimmed = rowStr.trim();
+      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+      getPatterns(trimmed).forEach((pattern) => {
         const perps = [];
-        // TODO: col, counts, perps
+        // TODO: col, perps
         segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
       });
     });
     columns.forEach((colStr, colIndex) => {
-      getPatterns(colStr.trim()).forEach((pattern) => {
+      const trimmed = rowStr.trim();
+      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+      getPatterns(trimmed).forEach((pattern) => {
         const perps = [];
-        // TODO: counts, perps, row
+        // TODO: perps, row
         segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
       });
     });
