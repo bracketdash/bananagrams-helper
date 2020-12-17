@@ -77,22 +77,8 @@ class Segment {
     return new Segment({ index: index + 1, segments, state });
   }
   init() {
+    const segments = [];
     const columns = [];
-    const produceSegments = (str, index, baseSegment) => {
-      const trimmed = str.trim();
-      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
-      getPatterns(trimmed).forEach((pattern) => {
-        const perps = [];
-        const segment = Object.assign({}, baseSegment);
-        if (segment.down) {
-          // TODO: perps, row
-          segments.push({ col: colIndex, counts, down: true, pattern, perps, row });
-        } else {
-          // TODO: col, perps
-          segments.push({ col, counts, down: false, pattern, perps, row: rowIndex });
-        }
-      });
-    };
     const rows = this.state
       .getBoard()
       .getArray()
@@ -105,12 +91,32 @@ class Segment {
         });
         return cols.join("");
       });
-    const segments = [];
+    const produceSegments = (str, index, down) => {
+      const trimmedLeft = str.trimLeft();
+      const trimmed = trimmedLeft.trimRight();
+      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+      const start = str.length - trimmedLeft.length;
+      const strArr = Array(str.length).keys();
+      getPatterns(trimmed).forEach((pattern) => {
+        const perps = new Map();
+        if (down) {
+          strArr.forEach((row) => {
+            // TODO: perps.set(row, { left, right });
+          });
+          segments.push({ col: index, counts, down, pattern, perps, row: start });
+        } else {
+          strArr.forEach((col) => {
+            // TODO: perps.set(col, { left, right });
+          });
+          segments.push({ col: start, counts, down, pattern, perps, row: index });
+        }
+      });
+    };
     rows.forEach((rowStr, rowIndex) => {
-      produceSegments(rowStr, rowIndex, { down: false, pattern, row: rowIndex });
+      produceSegments(rowStr, rowIndex, false);
     });
     columns.forEach((colStr, colIndex) => {
-      produceSegments(rowStr, rowIndex, { col: colIndex, down: true, pattern });
+      produceSegments(rowStr, rowIndex, true);
     });
     if (!segments.length) {
       return false;
