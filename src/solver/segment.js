@@ -1,4 +1,5 @@
 const getPatterns = (tiles) => {
+  // TODO: tiles: trim left except first space and right except last space
   const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
   const moddedPatternTest = /[a-z]+[^a-z]+[a-z]+/;
   const loop = (fullPattern, patterns, leftTrim, rightTrim) => {
