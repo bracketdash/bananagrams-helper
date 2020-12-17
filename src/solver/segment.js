@@ -52,7 +52,7 @@ const getPatterns = (tiles) => {
     return loop(fullPattern, patterns, leftTrim, rightTrim + 1);
   };
   return loop(fullPattern, [fullPattern], 0, 1);
-}
+};
 
 class Segment {
   constructor({ index, segments, state }) {
@@ -93,15 +93,18 @@ class Segment {
         }
       });
     };
-    const rows = this.state.getBoard().getArray().map((cols, row) => {
-      cols.forEach((cell, col) => {
-        if (!columns[col]) {
-          columns.push("");
-        }
-        columns[col] += cell;
+    const rows = this.state
+      .getBoard()
+      .getArray()
+      .map((cols, row) => {
+        cols.forEach((cell, col) => {
+          if (!columns[col]) {
+            columns.push("");
+          }
+          columns[col] += cell;
+        });
+        return cols.join("");
       });
-      return cols.join("");
-    });
     const segments = [];
     rows.forEach((rowStr, rowIndex) => {
       produceSegments(rowStr, rowIndex, { down: false, pattern, row: rowIndex });
