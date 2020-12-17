@@ -96,17 +96,15 @@ class Segment {
       const trimmed = trimmedLeft.trimRight();
       const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
       const perps = new Map();
-      Array(str.length)
-        .keys()
-        .forEach((perpIndex) => {
-          const wholePerp = down ? rows[perpIndex] : columns[perpIndex];
-          const left = wholePerp.slice(0, index).split(/\s+/).pop();
-          const right = wholePerp.slice(index + 1, 0).split(/\s+/)[0];
-          if (!left.length && !right.length) {
-            return;
-          }
-          perps.set(perpIndex, { left, right });
-        });
+      [...Array(str.length).keys()].forEach((perpIndex) => {
+        const wholePerp = down ? rows[perpIndex] : columns[perpIndex];
+        const left = wholePerp.slice(0, index).split(/\s+/).pop();
+        const right = wholePerp.slice(index + 1, 0).split(/\s+/)[0];
+        if (!left.length && !right.length) {
+          return;
+        }
+        perps.set(perpIndex, { left, right });
+      });
       const startingSegment = { counts, down, pattern, perps };
       getPatterns(trimmed).forEach((pattern) => {
         // TODO: const start
