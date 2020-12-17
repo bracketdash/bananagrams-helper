@@ -99,18 +99,22 @@ class Segment {
       Array(str.length)
         .keys()
         .forEach((perpIndex) => {
-          // TODO: left, right
-          if (!left && !right) {
+          const wholePerp = down ? rows[perpIndex] : columns[perpIndex];
+          const left = wholePerp.slice(0, index).split(/\s+/).pop();
+          const right = wholePerp.slice(index + 1, 0).split(/\s+/)[0];
+          if (!left.length && !right.length) {
             return;
           }
           perps.set(perpIndex, { left, right });
         });
       const startingSegment = { counts, down, pattern, perps };
       getPatterns(trimmed).forEach((pattern) => {
-        // TODO: const start = str.length - trimmedLeft.length; <-- not correct
+        // TODO: const start
         if (down) {
+          // `start` should be the row of the first tile of the pattern
           segments.push(Object.assign({ col: index, row: start }, startingSegment));
         } else {
+          // `start` should be the column of the first tile of the pattern
           segments.push(Object.assign({ col: start, row: index }, startingSegment));
         }
       });
