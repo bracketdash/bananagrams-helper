@@ -8,7 +8,7 @@ class Tray {
   getCountsWith(segment) {
     const counts = new Map();
     this.counts.forEach((count, letter) => {
-      counts[letter] = count;
+      counts.set(letter, count);
     });
     segment.getCounts().forEach((count, letter) => {
       counts.set(letter, this.counts.has(letter) ? this.counts.get(letter) + count : count);

@@ -67,7 +67,7 @@ class Word {
         return { branch, parts };
       };
       if (branch.has(BRANCHES_KEY)) {
-        branch.get(BRANCHES_KEY).some((childBranch, part) => {
+        [...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
           if (this.partMeetsCriteria(part)) {
             parts.push(part);
             branch = childBranch;
@@ -87,12 +87,12 @@ class Word {
       }
       const word = parts.join("");
       if (branch.has(FINISHES_WORD) && this.blacklist.allows(word) && this.segment.allows(word)) {
-        return new Word({ branch, parts, placement: this, segment: this.segment, word });
+        return new Word({ branch, parts, placement: this.placement, segment: this.segment, word });
       } else {
         return loop(parts.slice(), branch);
       }
     };
-    return loop(this.parts.slice() || ["a"], this.branch || this.trie.getData().get("a"));
+    return loop(this.parts ? this.parts.slice() : ["a"], this.branch || this.trie.getData().get("a"));
   }
   init() {
     const result = this.getNextValidWord();

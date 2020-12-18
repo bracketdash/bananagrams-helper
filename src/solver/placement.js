@@ -10,6 +10,41 @@ class Placement {
     this.trie = state.getSolve().getSolver().getTrie();
     this.word = word;
   }
+  getDelta() {
+    return this.placements[this.index];
+  }
+  getNext() {
+    const index = this.index ? this.index + 1 : 1;
+    const placements = this.placements;
+    const state = this.state;
+    if (index < this.placements.length) {
+      return new Placement({ index, placements, segment: this.segment, state, word: this.word });
+    }
+    let word = this.word.getNext();
+    if (word) {
+      return new Placement({ index, placements, segment: this.segment, state, word });
+    }
+    let segment = this.segment.getNext();
+    if (!segment) {
+      return false;
+    }
+    word = createWord({ segment, state: this.state });
+    while (!word) {
+      segment = segment.getNext();
+      if (segment) {
+        word = createWord({ segment, state: this.state });
+      } else {
+        return false;
+      }
+    }
+    return new Placement({ index, placements, segment, state, word });
+  }
+  getPlacedTiles() {
+    return this.tiles;
+  }
+  getState() {
+    return this.state;
+  }
   init() {
     const { down, pattern, perps } = this.segment.getData();
     const placements = [];
@@ -49,38 +84,6 @@ class Placement {
     }
     this.placements = placements;
     return true;
-  }
-  getDelta() {
-    return this.placements[this.index];
-  }
-  getNext() {
-    const index = this.index ? this.index + 1 : 1;
-    const placements = this.placements;
-    const state = this.state;
-    if (index < this.placements.length) {
-      return new Placement({ index, placements, segment: this.segment, state, word: this.word });
-    }
-    let word = this.word.getNext();
-    if (word) {
-      return new Placement({ index, placements, segment: this.segment, state, word });
-    }
-    let segment = this.segment.getNext();
-    if (!segment) {
-      return false;
-    }
-    word = createWord({ segment, state: this.state });
-    while (!word) {
-      segment = segment.getNext();
-      if (segment) {
-        word = createWord({ segment, state: this.state });
-      } else {
-        return false;
-      }
-    }
-    return new Placement({ index, placements, segment, state, word });
-  }
-  getPlacedTiles() {
-    return this.tiles;
   }
 }
 

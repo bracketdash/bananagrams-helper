@@ -99,7 +99,7 @@ class Trie {
           }
           return branch;
         };
-        this.data = processNode(0);
+        this.data = processNode(0).get(BRANCHES_KEY);
         resolve();
       });
     });
