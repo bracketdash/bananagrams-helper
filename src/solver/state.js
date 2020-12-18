@@ -4,9 +4,9 @@ class State {
   constructor({ board, parent, placement, solve, tray }) {
     this.board = board;
     this.parent = parent;
-    this.placement = placement || createPlacement({ state: this });
     this.solve = solve;
     this.tray = tray || solve.getTray();
+    this.placement = placement || createPlacement({ state: this });
   }
   getAdvanced() {
     const placement = createPlacement({ state: this });

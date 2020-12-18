@@ -23,21 +23,32 @@ class Segment {
     return new Segment({ index: index + 1, segments, state });
   }
   init() {
-    // TODO: handle a blank board appropriately
+    this.index = 0;
+    const boardArr = this.state.getBoard().getArray();
+    if (boardArr.length === 1 && boardArr[0].length === 1) {
+      this.segments = [
+        {
+          col: 0,
+          counts: new Map(),
+          down: true,
+          pattern: /.*/,
+          perps: new Map(),
+          row: 0,
+        },
+      ];
+      return true;
+    }
     const segments = [];
     const columns = [];
-    const rows = this.state
-      .getBoard()
-      .getArray()
-      .map((cols, row) => {
-        cols.forEach((cell, col) => {
-          if (!columns[col]) {
-            columns.push("");
-          }
-          columns[col] += cell;
-        });
-        return cols.join("");
+    const rows = boardArr.map((cols, row) => {
+      cols.forEach((cell, col) => {
+        if (!columns[col]) {
+          columns.push("");
+        }
+        columns[col] += cell;
       });
+      return cols.join("");
+    });
     const produceSegments = (str, index, down) => {
       const trimmedLeft = str.trimLeft();
       const trimmed = trimmedLeft.trimRight();
@@ -73,7 +84,6 @@ class Segment {
     if (!segments.length) {
       return false;
     }
-    this.index = 0;
     this.segments = segments;
   }
 }
