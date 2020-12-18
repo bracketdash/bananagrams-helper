@@ -36,6 +36,7 @@ class Word {
     const loop = (parts, branch) => {
       const inception = (branch, parts) => {
         let lastPart = parts.pop();
+        console.log(parts.join("."));
         if (
           ![...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
             if (lastPart) {
