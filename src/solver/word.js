@@ -37,7 +37,7 @@ class Word {
       const inception = (branch, parts) => {
         let lastPart = parts.pop();
         if (
-          ![...branch.get(BRANCHES_KEY).entries()].some((childBranch, part) => {
+          ![...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
             if (lastPart) {
               if (lastPart === part) {
                 lastPart = false;
@@ -82,9 +82,6 @@ class Word {
         return false;
       }
       const word = parts.join("");
-      // TODO: fix this bug:
-      console.log(parts.join(".")); // => "0"
-      console.log(branch); // => Array("a", Map(..))
       if (branch.has(FINISHES_WORD) && this.blacklist.allows(word) && this.segment.allows(word)) {
         return new Word({ branch, parts, segment: this.segment, state: this.state, word });
       } else {
