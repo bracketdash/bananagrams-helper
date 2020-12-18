@@ -88,12 +88,10 @@ class Word {
         return loop(parts.slice(), branch);
       }
     };
-    return loop(this.parts ? this.parts.slice() : ["a"], this.branch || this.trie.getData().get(BRANCHES_KEY).get("a"));
+    return loop(this.parts ? this.parts.slice() : [""], this.branch || this.trie.getData());
   }
   init() {
     const result = this.getNextValidWord();
-    console.log(`getNextValidWord:`);
-    console.log(result);
     if (!result) {
       return false;
     }
