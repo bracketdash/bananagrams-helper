@@ -47,6 +47,7 @@ const getPatterns = (tiles) => {
     if (needsLeftTrimIteration) {
       return loop(fullPattern, patterns, leftTrim + 1, 0);
     } else {
+      // TODO: push { leftTrim, pattern, rightTrim }
       patterns.push(moddedPattern);
     }
     return loop(fullPattern, patterns, leftTrim, rightTrim + 1);
@@ -94,6 +95,7 @@ class Segment {
     const produceSegments = (str, index, down) => {
       const trimmedLeft = str.trimLeft();
       const trimmed = trimmedLeft.trimRight();
+      const inLeft = str.length - trimmedLeft.length;
       const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
       const perps = new Map();
       [...Array(str.length).keys()].forEach((perpIndex) => {
@@ -105,14 +107,13 @@ class Segment {
         }
         perps.set(perpIndex, { left, right });
       });
-      const startingSegment = { counts, down, pattern, perps };
-      getPatterns(trimmed).forEach((pattern) => {
-        // TODO: const start
+      const startingSegment = { counts, down, perps };
+      getPatterns(trimmed).forEach(({ leftTrim, pattern }) => {
+        const start = leftTrim + inLeft;
+        startingSegment.pattern = pattern;
         if (down) {
-          // `start` should be the row of the first tile of the pattern
           segments.push(Object.assign({ col: index, row: start }, startingSegment));
         } else {
-          // `start` should be the column of the first tile of the pattern
           segments.push(Object.assign({ col: start, row: index }, startingSegment));
         }
       });
