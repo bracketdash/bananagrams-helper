@@ -3498,7 +3498,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "bananagrams-helper@workspace:."
   dependencies:
-    efrt: ^2.2.2
+    efrt: 2.2.2
     react: ^17.0.1
     react-dom: ^17.0.1
     react-scripts: 4.0.1
@@ -5467,7 +5467,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"efrt@npm:^2.2.2":
+"efrt@npm:2.2.2":
   version: 2.2.2
   resolution: "efrt@npm:2.2.2"
   checksum: 49e630866122a7f78cc372b86351958f9537f3b146b35d3c55296bb682eb67d4c233d64fb370f41de342fd8f3494d887d3b45dcac37953b1225ca8b0343eb059
