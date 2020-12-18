@@ -17,7 +17,7 @@ class Tray {
   }
   getNext(tilesToRemove) {
     let newTrayStr = this.str;
-    tilesToRemove.forEach((tileToRemove) => {
+    tilesToRemove.split("").forEach((tileToRemove) => {
       newTrayStr = newTrayStr.replace(tileToRemove, "");
     });
     return new Tray(newTrayStr);

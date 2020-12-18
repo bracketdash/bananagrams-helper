@@ -73,6 +73,7 @@ class Word {
         })
       ) {
       } else if (branch.has(PARENT_BRANCH)) {
+        // TODO: FIX
         console.log("Would start inception (returning for now)");
         return;
         const result = inception(branch.get(PARENT_BRANCH), parts);

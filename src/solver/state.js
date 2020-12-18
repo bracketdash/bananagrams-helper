@@ -7,10 +7,9 @@ class State {
     this.solve = solve;
     this.tray = tray || solve.getTray();
     this.placement = placement || createPlacement({ state: this });
-    console.log(`this.placement:`);
-    console.log(this.placement);
   }
   getAdvanced() {
+    // TODO: FIX
     console.log("createPlacement 2 -- 'yo' tray shouldn't make it here");
     const placement = createPlacement({ state: this });
     if (!placement) {

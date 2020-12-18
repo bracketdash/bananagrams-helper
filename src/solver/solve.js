@@ -33,6 +33,10 @@ class Solve {
     return this.start;
   }
   step(state) {
+    // TODO: there is a bug that assigns a placement ahead of where we should be
+    // TODO: the first state should not have a placement, but it has "oy"
+    // TODO: the second state should have that placement, along with the updated board and tray
+    console.log(state);
     if (state.isSolved()) {
       this.handleUpdate(state, "Solution found!");
       return;

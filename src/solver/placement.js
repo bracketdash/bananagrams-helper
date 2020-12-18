@@ -40,7 +40,7 @@ class Placement {
     return new Placement({ index, placements, segment, state, word });
   }
   getPlacedTiles() {
-    return this.tiles;
+    return this.placements[this.index].tiles;
   }
   getState() {
     return this.state;
@@ -80,7 +80,13 @@ class Placement {
       } else {
         row = row + start;
       }
-      placements.push({ col, down, row, wordArr });
+      let tiles = wordStr;
+      this.segment.getCounts().forEach((count, letter) => {
+        [...Array(count).keys()].forEach(() => {
+          tiles = tiles.replace(letter, "");
+        });
+      });
+      placements.push({ col, down, row, tiles, wordArr });
       index = lastIndex + (index || 1);
     }
     if (!placements.length) {
@@ -88,7 +94,6 @@ class Placement {
     }
     this.index = 0;
     this.placements = placements;
-    // TODO: this.tiles
     return true;
   }
 }
