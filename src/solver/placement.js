@@ -93,6 +93,8 @@ export const createPlacement = ({ index, placements, segment, state, word }) => 
     return false;
   }
   word = word || createWord({ segment, state });
+  console.log(`word`);
+  console.log(word);
   if (!word) {
     return false;
   }

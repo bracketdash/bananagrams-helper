@@ -33,14 +33,16 @@ const decode = (code) => {
 class Trie {
   contains(word) {
     const loop = (trie, str) => {
-      if ([...trie.keys()].some((part) => {
-        if (str.startsWith(part)) {
-          str = str.replace(part, "");
-          trie = trie.get(str);
-          return true;
-        }
-        return false;
-      })) {
+      if (
+        [...trie.keys()].some((part) => {
+          if (str.startsWith(part)) {
+            str = str.replace(part, "");
+            trie = trie.get(str);
+            return true;
+          }
+          return false;
+        })
+      ) {
         if (trie.has(FINISHES_WORD)) {
           return true;
         }
@@ -99,7 +101,9 @@ class Trie {
           }
           return branch;
         };
-        this.data = processNode(0).get(BRANCHES_KEY);
+        const data = new Map();
+        data.set(BRANCHES_KEY, processNode(0, data).get(BRANCHES_KEY));
+        this.data = data;
         resolve();
       });
     });
