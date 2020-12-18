@@ -47,8 +47,10 @@ const getPatterns = (tiles) => {
     if (needsLeftTrimIteration) {
       return loop(fullPattern, patterns, leftTrim + 1, 0);
     } else {
-      // TODO: push { leftTrim, pattern, rightTrim }
-      patterns.push(moddedPattern);
+      patterns.push({
+        leftTrim: leftTrim, // TODO: `leftTrim` isn't actually what we want
+        pattern: moddedPattern,
+      });
     }
     return loop(fullPattern, patterns, leftTrim, rightTrim + 1);
   };
