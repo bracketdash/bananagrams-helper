@@ -4,7 +4,7 @@ class State {
   constructor({ board, parent, placement, solve, tray }) {
     this.board = board;
     this.parent = parent;
-    this.placement = placement;
+    this.placement = placement || createPlacement({ state: this });
     this.solve = solve;
     this.tray = tray || solve.getTray();
   }
@@ -25,6 +25,9 @@ class State {
   }
   getNext() {
     const parent = this.parent;
+    if (!parent) {
+      return false;
+    }
     const placement = parent.getPlacement().getNext();
     if (!placement) {
       return false;

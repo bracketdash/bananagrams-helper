@@ -1,61 +1,4 @@
-import { getLetterCounts } from "./utilities";
-
-const getPatterns = (tiles) => {
-  const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
-  const moddedPatternTest = /[a-z]+[^a-z]+[a-z]+/;
-  const loop = (fullPattern, patterns, leftTrim, rightTrim) => {
-    let allDone = false;
-    let needsLeftTrimIteration = false;
-    let moddedPattern = fullPattern;
-    [...Array(leftTrim).keys()].forEach(() => {
-      if (moddedPatternTest.test(moddedPattern)) {
-        moddedPattern = moddedPattern.replace(/^[^a-z]*[a-z]+/, "");
-        moddedPattern = moddedPattern.replace(/^\.\{([0-9]*)\}/, function (_, captured) {
-          const num = parseInt(captured);
-          if (num < 2) {
-            return "";
-          }
-          return ".{0," + (num - 1) + "}";
-        });
-      } else {
-        allDone = true;
-      }
-    });
-    [...Array(rightTrim).keys()].forEach(() => {
-      if (moddedPatternTest.test(moddedPattern)) {
-        moddedPattern = moddedPattern.replace(/[a-z]+[^a-z]*$/, "");
-        moddedPattern = moddedPattern.replace(/\.\{([0-9]*)\}$/, function (_, captured) {
-          const num = parseInt(captured);
-          if (num < 2) {
-            return "";
-          }
-          return ".{0," + (num - 1) + "}";
-        });
-      } else {
-        needsLeftTrimIteration = true;
-      }
-    });
-    if (leftTrim > 0) {
-      moddedPattern = "^" + moddedPattern;
-    }
-    if (rightTrim > 0) {
-      moddedPattern = moddedPattern + "$";
-    }
-    if (allDone) {
-      return patterns;
-    }
-    if (needsLeftTrimIteration) {
-      return loop(fullPattern, patterns, leftTrim + 1, 0);
-    } else {
-      patterns.push({
-        leftTrim: leftTrim, // TODO: `leftTrim` isn't actually what we want
-        pattern: moddedPattern,
-      });
-    }
-    return loop(fullPattern, patterns, leftTrim, rightTrim + 1);
-  };
-  return loop(fullPattern, [fullPattern], 0, 1);
-};
+import { getLetterCounts, getPatterns } from "./utilities";
 
 class Segment {
   constructor({ index, segments, state }) {
@@ -80,6 +23,7 @@ class Segment {
     return new Segment({ index: index + 1, segments, state });
   }
   init() {
+    // TODO: handle a blank board appropriately
     const segments = [];
     const columns = [];
     const rows = this.state
@@ -110,8 +54,8 @@ class Segment {
         perps.set(perpIndex, { left, right });
       });
       const startingSegment = { counts, down, perps };
-      getPatterns(trimmed).forEach(({ leftTrim, pattern }) => {
-        const start = leftTrim + inLeft;
+      getPatterns(trimmed).forEach(({ tilesLeftTrim, pattern }) => {
+        const start = tilesLeftTrim + inLeft;
         startingSegment.pattern = pattern;
         if (down) {
           segments.push(Object.assign({ col: index, row: start }, startingSegment));

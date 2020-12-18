@@ -1,5 +1,5 @@
 import { BRANCHES_KEY, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
-import wordsTxt from "./assets/words.txt";
+import wordsTxt from "../assets/words.txt";
 
 const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
 

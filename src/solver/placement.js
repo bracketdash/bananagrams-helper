@@ -86,10 +86,14 @@ class Placement {
 
 export const createPlacement = ({ index, placements, segment, state, word }) => {
   segment = segment || createSegment({ state });
+  console.log(`segment`);
+  console.log(segment);
   if (!segment) {
     return false;
   }
   word = word || createWord({ segment, state });
+  console.log(`word`);
+  console.log(word);
   if (!word) {
     return false;
   }

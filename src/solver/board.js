@@ -6,7 +6,7 @@ class Board {
   }
   getArray() {
     return [...Array(this.numRows).keys()].map((rowIndex) => {
-      const row = this.board.get(rowIndex);
+      const row = this.rows.get(rowIndex);
       const columns = Array(this.numCols).fill(" ");
       if (row) {
         row.forEach((col, colIndex) => {
