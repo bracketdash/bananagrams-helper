@@ -35,8 +35,8 @@ class Word {
   getNextValidWord() {
     const loop = (parts, branch) => {
       const inception = (branch, parts) => {
+        // TODO: FIX THIS
         let lastPart = parts.pop();
-        console.log(parts.join("."));
         if (
           ![...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
             if (lastPart) {
@@ -64,7 +64,7 @@ class Word {
       if (
         branch.has(BRANCHES_KEY) &&
         [...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
-          if (this.partMeetsCriteria(part)) {
+          if (this.partMeetsCriteria(parts.join("") + part)) {
             parts.push(part);
             branch = childBranch;
             return true;
@@ -73,6 +73,8 @@ class Word {
         })
       ) {
       } else if (branch.has(PARENT_BRANCH)) {
+        console.log("Would start inception (returning for now)");
+        return;
         const result = inception(branch.get(PARENT_BRANCH), parts);
         if (!result) {
           return false;
@@ -91,6 +93,9 @@ class Word {
     };
     return loop(this.parts ? this.parts.slice() : [""], this.branch || this.trie.getData());
   }
+  getString() {
+    return this.word;
+  }
   init() {
     const result = this.getNextValidWord();
     if (!result) {
@@ -100,6 +105,7 @@ class Word {
     this.parts = result.parts;
     this.word = result.word;
     this.wordArr = result.word.split("");
+    return true;
   }
   partMeetsCriteria(part) {
     const counts = this.tray.getCountsWith(this.segment);
