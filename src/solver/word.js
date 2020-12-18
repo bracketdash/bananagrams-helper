@@ -92,6 +92,8 @@ class Word {
   }
   init() {
     const result = this.getNextValidWord();
+    console.log(`getNextValidWord:`);
+    console.log(result);
     if (!result) {
       return false;
     }
