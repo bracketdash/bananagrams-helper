@@ -1,3 +1,5 @@
+// Steps 4, 5, & 6 are UNDER CONSTRUCTION - see step-4-placement.js for details
+
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 
 import { trieRoot } from "../util/trie";
@@ -36,7 +38,6 @@ class Word {
   getNextValidWord() {
     const loop = (parts, branch) => {
       const inception = (branch, parts) => {
-        // TODO: FIX THIS
         let lastPart = parts.pop();
         if (
           ![...branch.get(BRANCHES).entries()].some(([part, childBranch]) => {
@@ -74,7 +75,7 @@ class Word {
         })
       ) {
       } else if (branch.has(PARENT_BRANCH)) {
-        // TODO: FIX
+        // TODO: fix inception()
         console.log("Would start inception (returning for now)");
         return;
         const result = inception(branch.get(PARENT_BRANCH), parts);

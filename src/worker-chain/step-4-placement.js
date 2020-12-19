@@ -1,3 +1,16 @@
+// Steps 4, 5, & 6 are UNDER CONSTRUCTION - see below for details
+/*
+
+Slight refactor of these final 3 steps...
+
+Placement should only need to care about getting the next word from the current segment
+If the current segment is out of words (i.e. returns false), then we try the next segment, etc.
+The segment should worry about what words belong to it
+
+(also need to finish doing our map & symbol conversion for these 3 files)
+
+*/
+
 import { isAWord } from "../util/trie";
 
 import createSegment from "./segment";
@@ -101,15 +114,21 @@ class Placement {
   }
 }
 
-export default ({ index, placements, segment, state, word }) => {
-  segment = segment || createSegment({ state });
+export default (config) => {
+  const segment = createSegment(config.get(BOARD));
   if (!segment) {
     return false;
   }
-  word = word || createWord({ segment, state });
+  
+  const wordConfig = new Map();
+  wordConfig.set(BLACKLIST, config.get(BLACKLIST));
+  wordConfig.set(SEGMENT, segment);
+  wordConfig.set(TRAY, config.get(TRAY));
+  const word = createWord(wordConfig);
   if (!word) {
     return false;
   }
+  
   const newPlacement = new Placement({ index, placements, segment, state, word });
   if (!newPlacement.init()) {
     return false;

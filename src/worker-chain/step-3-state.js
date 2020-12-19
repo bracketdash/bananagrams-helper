@@ -1,4 +1,4 @@
-import { BOARD } from "./util/symbols";
+import { BLACKLIST, BOARD, PARENT_STATE, PLACEMENT, TRAY } from "./util/symbols";
 
 import createPlacement from "./placement";
 
@@ -6,66 +6,65 @@ class State {
   constructor(config) {
     this.data = config;
   }
-  
+
   getAdvanced() {
-    const placementData = new Map();
-    
-    // TODO: START HERE
-    // In progress: going through and using maps with symbols for keys
-    
-    placementData.set();
-    const placement = createPlacement(placementData);
+    const $data = this.data;
+    const placement = createPlacement($data);
     if (!placement) {
       return false;
     }
-    return new State({
-      board: this.board.getNext(placement.getDelta()),
-      parent: this,
-      placement,
-      tray: this.tray.getNext(placement.getPlacedTiles()),
-    });
+    
+    const config = new Map();
+    config.set(BLACKLIST, $data.get(BLACKLIST));
+    config.set(BOARD, $data.get(BOARD).getNext(placement.getDelta()));
+    config.set(PARENT_STATE, this);
+    config.set(PLACEMENT, placement);
+    config.set(TRAY, $data.get(TRAY).getNext(placement.getPlacedTiles()));
+    
+    return new State(config);
   }
-  
+
   getBoard() {
     return this.data.get(BOARD);
   }
-  
+
   getNext() {
-    const parent = this.parent;
+    const $data = this.data;
+    
+    const parent = $data.get(PARENT_STATE);
     if (!parent) {
       return false;
     }
+    
     const placement = parent.getPlacement().getNext();
     if (!placement) {
       return false;
     }
-    const board = this.board.getNext(placement.getDelta());
-    if (!board) {
-      return false;
-    }
-    return new State({
-      blacklist: this.blacklist,
-      board,
-      parent,
-      placement,
-      tray: this.tray.getNext(placement.getPlacedTiles()),
-    });
+    
+    const config = new Map();
+    config.set(BLACKLIST, $data.get(BLACKLIST));
+    config.set(BOARD, $data.get(BOARD).getNext(placement.getDelta()));
+    config.set(PARENT_STATE, this);
+    config.set(PLACEMENT, placement);
+    config.set(TRAY, $data.get(TRAY).getNext(placement.getPlacedTiles()));
+    
+    return new State(config);
   }
-  
+
   getPlacement() {
-    return this.placement;
+    return this.data.get(PLACEMENT);
   }
-  
+
   getPrev() {
-    return this.previous;
+    return this.data.get(PARENT_STATE);
   }
-  
+
   getTray() {
-    return this.tray;
+    return this.data.get(TRAY);
   }
-  
+
   isSolved() {
-    return this.tray.isEmpty();
+    return this.data.get(TRAY).isEmpty();
   }
 }
 

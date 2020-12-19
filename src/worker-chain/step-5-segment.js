@@ -1,3 +1,5 @@
+// Steps 4, 5, & 6 are UNDER CONSTRUCTION - see step-4-placement.js for details
+
 import getLetterCounts from "../util/getLetterCounts";
 import getPatterns from "../util/getPatterns";
 
