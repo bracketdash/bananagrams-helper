@@ -1,4 +1,4 @@
-import { BRANCHES_KEY, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
+import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 import wordsTxt from "../assets/words.txt";
 
 const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
@@ -74,7 +74,7 @@ class Trie {
           let node = nodes[index];
           const branch = new Map();
           const branches = new Map();
-          branch.set(BRANCHES_KEY, branches);
+          branch.set(BRANCHES, branches);
           if (parentBranch) {
             branch.set(PARENT_BRANCH, parentBranch);
           }
@@ -102,7 +102,7 @@ class Trie {
           return branch;
         };
         const data = new Map();
-        data.set(BRANCHES_KEY, processNode(0, data).get(BRANCHES_KEY));
+        data.set(BRANCHES, processNode(0, data).get(BRANCHES));
         this.data = data;
         resolve();
       });
