@@ -16,7 +16,7 @@ class State {
       return false;
     }
     return new State({
-      board: this.board.getNext(placement),
+      board: this.board.getNext(placement.getDelta()),
       parent: this,
       placement,
       tray: this.tray.getNext(placement.getPlacedTiles()),
@@ -36,7 +36,7 @@ class State {
     if (!placement) {
       return false;
     }
-    const board = this.board.getNext(placement);
+    const board = this.board.getNext(placement.getDelta());
     if (!board) {
       return false;
     }

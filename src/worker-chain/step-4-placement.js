@@ -1,4 +1,4 @@
-import Trie from "../classes/Trie";
+import { isAWord } from "../util/trie";
 
 import createSegment from "./segment";
 import createWord from "./word";
@@ -44,7 +44,7 @@ class Placement {
   }
 
   getPlacedTiles() {
-    return this.placements[this.index].tiles;
+    return this.placements[this.index].tiles.split("");
   }
 
   init() {
@@ -68,7 +68,7 @@ class Placement {
           const perpIndex = start + letterIndex;
           if (perps.has(perpIndex)) {
             const { left, right } = perps.get(perpIndex);
-            if (!Trie.contains(`${left || ""}${letter}${right || ""}`)) {
+            if (!isAWord(`${left || ""}${letter}${right || ""}`)) {
               return true;
             }
           }
@@ -88,6 +88,7 @@ class Placement {
           tiles = tiles.replace(letter, "");
         });
       });
+      tiles = tiles.split("");
       placements.push({ col, down, row, tiles, wordArr });
       index = lastIndex + (index || 1);
     }

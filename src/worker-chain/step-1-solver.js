@@ -1,6 +1,6 @@
-import { BLACKLIST, BLACKLIST_STRING, CURRENT_SOLVE, TRAY, TRAY_STRING, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
+import { BLACKLIST, BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, TRAY_STRING, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
 
-import Trie from "./classes/Trie";
+import { downloadAndUnPackTrie } from "../util/trie";
 
 import createBlacklist from "../factories/blacklist";
 import createSolve from "../factories/solve";
@@ -9,8 +9,10 @@ import createTray from "../factories/tray";
 class Solver {
   constructor() {
     this.data = new Map();
-    Trie.init().then(() => {
-      this.data.get(UPDATE_FUNCTION)({ ready: true });
+    downloadAndUnPackTrie().then(() => {
+      const updateConfig = new Map();
+      updateConfig.set(READY, true);
+      this.data.get(UPDATE_FUNCTION)(updateConfig);
     });
   }
 
@@ -18,7 +20,7 @@ class Solver {
     this.data.set(UPDATE_FUNCTION, update);
   }
 
-  solve({ blacklistStr, trayStr }) {
+  solve(trayStr, blacklistStr) {
     const $data = this.data;
     if (blacklistStr) {
       $data.set(BLACKLIST_STRING, blacklistStr);

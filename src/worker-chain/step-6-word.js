@@ -1,5 +1,6 @@
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
-import Trie from "../classes/Trie";
+
+import { trieRoot } from "../util/trie";
 
 class Word {
   constructor({ branch, parts, segment, state, word }) {
@@ -92,7 +93,7 @@ class Word {
         return loop(parts.slice(), branch);
       }
     };
-    return loop(this.parts ? this.parts.slice() : [""], this.branch || Trie.getData());
+    return loop(this.parts ? this.parts.slice() : [""], this.branch || trieRoot);
   }
   getString() {
     return this.word;
@@ -109,7 +110,7 @@ class Word {
     return true;
   }
   partMeetsCriteria(part) {
-    const counts = this.tray.getCountsWith(this.segment);
+    const counts = this.tray.getCountsWith(this.segment.getCounts());
     while (part.length > 0) {
       const letter = part[0];
       let instances = 0;

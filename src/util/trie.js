@@ -1,6 +1,12 @@
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
-import decode from "../util/decode";
+
 import wordsTxt from "../assets/words.txt";
+
+import decode from "../util/decode";
+
+// TODO: export const downloadAndUnPackTrie
+// TODO: export const isAWord
+// TODO: export const trieRoot
 
 class Trie {
   contains(word) {

@@ -1,4 +1,4 @@
-import { BLACKLIST, BOARD, CURRENT_SOLVE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
+import { BLACKLIST, BOARD, BOARD_ARRAY, CURRENT_SOLVE, MESSAGE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
 
 import createBoard from "./board";
 import createState from "./state";
@@ -10,10 +10,12 @@ class Solve {
 
   handleUpdate(state, message) {
     const data = new Map();
-    const boardArr = state.getBoard().getArray();
-    const remainingTray = state.getTray().getString();
+    const updateData = new Map();
+    updateData.set(BOARD_ARRAY, state.getBoard().getArray());
+    updateData.set(MESSAGE, message);
+    updateData.set(TRAY, state.getTray().getString());
     data.set(CURRENT_SOLVE, this);
-    data.set(UPDATE_DATA, { boardArr, message, remainingTray });
+    data.set(UPDATE_DATA, updateData);
     return this.data.get(UPDATE_FUNCTION)(data);
   }
 

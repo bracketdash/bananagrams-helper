@@ -9,6 +9,7 @@ const labels = [
   "NUMBER_OF_COLUMNS",
   "NUMBER_OF_ROWS",
   "PARENT_BRANCH",
+  "READY",
   "ROW_INDEX",
   "ROWS",
   "TRAY_STRING",

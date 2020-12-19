@@ -1,15 +1,30 @@
 import { useState } from "react";
-import Blacklist from "./components/Blacklist";
-import Solver from "./classes/Solver";
-import Tray from "./components/Tray";
+
+import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
+
+import Blacklist from "./blacklist";
+import Tray from "./tray";
+
+import solver from "../worker-chain/step-1-solver";
 
 export default () => {
   const [boardArr, setBoardArr] = useState([[" "]]);
   const [message, setMessage] = useState("Loading...");
   const [ready, setReady] = useState(false);
   const [remainingTray, setRemainingTray] = useState("");
-  const setters = { setBoardArr, setMessage, setReady, setRemainingTray };
-  Solver.onUpdate((update) => Object.keys(update).forEach((key) => setters[`set${key.slice(0, 1).toUpperCase()}${key.slice(1)}`](update[key])));
+
+  const setters = new Map();
+  setters.set(BOARD_ARRAY, setBoardArr);
+  setters.set(MESSAGE, setMessage);
+  setters.set(READY, setReady);
+  setters.set(TRAY, setRemainingTray);
+
+  solver.onUpdate((update) => {
+    update.keys().forEach((key) => {
+      setters.get(key)(update.get(key));
+    });
+  });
+
   return (
     <div>
       <div className="header">

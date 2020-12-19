@@ -5,17 +5,19 @@ class Board {
     if (config) {
       this.data = config;
     } else {
-      this.data = new Map();
-      this.data.set(NUMBER_OF_COLUMNS, 1);
-      this.data.set(NUMBER_OF_ROWS, 1);
-      this.data.set(ROWS, new Map([[0, new Map([[0, " "]])]]));
+      const $data = new Map();
+      $data.set(NUMBER_OF_COLUMNS, 1);
+      $data.set(NUMBER_OF_ROWS, 1);
+      $data.set(ROWS, new Map([[0, new Map([[0, " "]])]]));
+      this.data = $data;
     }
   }
-  
+
   getArray() {
-    return [...Array(this.data.get(NUMBER_OF_ROWS)).keys()].map((rowIndex) => {
-      const row = this.data.get(ROWS).get(rowIndex);
-      const columns = Array(this.data.get(NUMBER_OF_COLUMNS)).fill(" ");
+    const $data = this.data;
+    return [...Array($data.get(NUMBER_OF_ROWS)).keys()].map((rowIndex) => {
+      const row = $data.get(ROWS).get(rowIndex);
+      const columns = Array($data.get(NUMBER_OF_COLUMNS)).fill(" ");
       if (row) {
         row.forEach((col, colIndex) => {
           columns[colIndex] = col;
@@ -24,13 +26,13 @@ class Board {
       return columns;
     });
   }
-  
-  getNext(placement) {
-    const placementDelta = placement.getDelta();
+
+  getNext(delta) {
+    const $data = this.data;
     const rows = new Map();
-    let newRow = placementDelta.get(ROW_INDEX);
-    let newCol = placementDelta.get(COLUMN_INDEX);
-    let numCols = this.data.get(NUMBER_OF_COLUMNS);
+    let newRow = delta.get(ROW_INDEX);
+    let newCol = delta.get(COLUMN_INDEX);
+    let numCols = $data.get(NUMBER_OF_COLUMNS);
     let rowsToAdd = 0;
     let colsToAdd = 0;
     if (newRow < 0) {
@@ -41,7 +43,7 @@ class Board {
       colsToAdd = -newCol;
       newCol = 0;
     }
-    this.data.get(ROWS).forEach((rowCols, rowKey) => {
+    $data.get(ROWS).forEach((rowCols, rowKey) => {
       const cols = new Map();
       rowCols.forEach((col, colKey) => {
         if (colsToAdd + colKey + 1 > numCols) {
@@ -51,8 +53,8 @@ class Board {
       });
       rows.set(rowsToAdd + rowKey, cols);
     });
-    if (placementDelta.get(IS_DOWN)) {
-      placementDelta..get(WORD_ARRAY).forEach((letter, index) => {
+    if (delta.get(IS_DOWN)) {
+      delta.get(WORD_ARRAY).forEach((letter, index) => {
         const newRowPlusIndex = newRow + index;
         if (!rows.has(newRowPlusIndex)) {
           rows.set(newRowPlusIndex, new Map());
@@ -62,7 +64,7 @@ class Board {
       });
     } else {
       const tileRow = rows.get(newRow);
-      placementDelta.get(WORD_ARRAY).forEach((letter, index) => {
+      delta.get(WORD_ARRAY).forEach((letter, index) => {
         const colPlusIndex = newCol + index;
         tileRow.set(colPlusIndex, letter);
       });
