@@ -9,7 +9,10 @@ class State {
   
   getAdvanced() {
     const placementData = new Map();
+    
     // TODO: START HERE
+    // In progress: going through and using maps with symbols for keys
+    
     placementData.set();
     const placement = createPlacement(placementData);
     if (!placement) {
