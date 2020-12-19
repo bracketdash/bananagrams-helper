@@ -1,4 +1,4 @@
-import { BRANCHES_KEY, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
+import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 
 class Word {
   constructor({ branch, parts, segment, state, word }) {
@@ -38,7 +38,7 @@ class Word {
         // TODO: FIX THIS
         let lastPart = parts.pop();
         if (
-          ![...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
+          ![...branch.get(BRANCHES).entries()].some(([part, childBranch]) => {
             if (lastPart) {
               if (lastPart === part) {
                 lastPart = false;
@@ -62,8 +62,8 @@ class Word {
         return { branch, parts };
       };
       if (
-        branch.has(BRANCHES_KEY) &&
-        [...branch.get(BRANCHES_KEY).entries()].some(([part, childBranch]) => {
+        branch.has(BRANCHES) &&
+        [...branch.get(BRANCHES).entries()].some(([part, childBranch]) => {
           if (this.partMeetsCriteria(parts.join("") + part)) {
             parts.push(part);
             branch = childBranch;
