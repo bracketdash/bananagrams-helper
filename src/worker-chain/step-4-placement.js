@@ -11,10 +11,7 @@ The segment should worry about what words belong to it
 
 */
 
-import { isAWord } from "../util/trie";
-
 import createSegment from "./segment";
-import createWord from "./word";
 
 class Placement {
   constructor({ index, placements, segment, state, word }) {

@@ -1,7 +1,10 @@
 // Steps 4, 5, & 6 are UNDER CONSTRUCTION - see step-4-placement.js for details
 
+import { isAWord } from "../util/trie";
 import getLetterCounts from "../util/getLetterCounts";
 import getPatterns from "../util/getPatterns";
+
+import createWord from "./word";
 
 class Segment {
   constructor({ index, segments, state }) {
@@ -57,6 +60,7 @@ class Segment {
       });
       return cols.join("");
     });
+    // TODO: move this out of the class
     const produceSegments = (str, index, down) => {
       const trimmedLeft = str.trimLeft();
       const trimmed = trimmedLeft.trimRight();
