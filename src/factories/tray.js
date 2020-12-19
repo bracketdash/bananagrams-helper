@@ -30,4 +30,4 @@ class Tray {
   }
 }
 
-export const createTray = (str) => new Tray(str);
+export default (str) => new Tray(str);

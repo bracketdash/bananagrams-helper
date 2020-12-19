@@ -1,39 +1,31 @@
-import { createBoard } from "./board";
-import { createState } from "./state";
+import { BLACKLIST, BOARD, CURRENT_SOLVE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
+
+import createBoard from "./board";
+import createState from "./state";
 
 class Solve {
-  constructor({ blacklist, solver, tray, update }) {
-    this.blacklist = blacklist;
-    this.solver = solver;
-    this.tray = tray;
-    this.update = update;
+  constructor(config) {
+    this.data = config;
   }
-  getBlacklist() {
-    return this.blacklist;
-  }
-  getTray() {
-    return this.tray;
-  }
+
   handleUpdate(state, message) {
+    const data = new Map();
     const boardArr = state.getBoard().getArray();
     const remainingTray = state.getTray().getString();
-    return this.update({ boardArr, message, remainingTray }, this.start);
+    data.set(CURRENT_SOLVE, this);
+    data.set(UPDATE_DATA, { boardArr, message, remainingTray });
+    return this.data.get(UPDATE_FUNCTION)(data);
   }
-  start() {
-    this.start = new Date().getTime();
-    this.step(
-      createState({
-        board: createBoard({}),
-        solve: this,
-      })
-    );
-    return this.start;
+
+  init() {
+    const stateConfig = new Map();
+    stateConfig.set(BLACKLIST, this.data.get(BLACKLIST));
+    stateConfig.set(BOARD, createBoard());
+    stateConfig.set(TRAY, this.data.get(TRAY));
+    this.step(createState(stateConfig));
   }
+
   step(state) {
-    // TODO: there is a bug that assigns a placement ahead of where we should be
-    // TODO: the first state should not have a placement, but it has "oy"
-    // TODO: the second state should have that placement, along with the updated board and tray
-    console.log(state);
     if (state.isSolved()) {
       this.handleUpdate(state, "Solution found!");
       return;
@@ -51,19 +43,18 @@ class Solve {
       }
     }
   }
-  tryNextStep(maybeNextState, message) {
-    if (!maybeNextState) {
-      return false;
+
+  tryNextStep(state, message) {
+    if (state && this.handleUpdate(state, message)) {
+      setTimeout(() => this.step(state));
+      return true;
     }
-    const nextStepTimeout = setTimeout(() => this.step(maybeNextState));
-    if (!this.handleUpdate(maybeNextState, message)) {
-      clearTimeout(nextStepTimeout);
-    }
-    return true;
+    return false;
   }
 }
 
-export const createSolve = (config) => {
+export default (config) => {
   const solve = new Solve(config);
-  return solve.start();
+  solve.init();
+  return solve;
 };

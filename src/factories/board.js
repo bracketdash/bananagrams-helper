@@ -1,12 +1,17 @@
-import { COLUMN_INDEX, IS_DOWN, NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, ROW_INDEX, ROWS, WORD_ARRAY } from "./symbols";
+import { COLUMN_INDEX, IS_DOWN, NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, ROW_INDEX, ROWS, WORD_ARRAY } from "../util/symbols";
 
 class Board {
   constructor(config) {
-    this.data = new Map();
-    this.data.set(NUMBER_OF_COLUMNS, config.get(NUMBER_OF_COLUMNS) || 1);
-    this.data.set(NUMBER_OF_ROWS, config.get(NUMBER_OF_ROWS) || 1);
-    this.data.set(ROWS, config.get(ROWS) || new Map([[0, new Map([[0, " "]])]]));
+    if (config) {
+      this.data = config;
+    } else {
+      this.data = new Map();
+      this.data.set(NUMBER_OF_COLUMNS, 1);
+      this.data.set(NUMBER_OF_ROWS, 1);
+      this.data.set(ROWS, new Map([[0, new Map([[0, " "]])]]));
+    }
   }
+  
   getArray() {
     return [...Array(this.data.get(NUMBER_OF_ROWS)).keys()].map((rowIndex) => {
       const row = this.data.get(ROWS).get(rowIndex);
@@ -19,6 +24,7 @@ class Board {
       return columns;
     });
   }
+  
   getNext(placement) {
     const placementDelta = placement.getDelta();
     const rows = new Map();
@@ -70,4 +76,4 @@ class Board {
   }
 }
 
-export const createBoard = (config) => new Board(config);
+export default (config) => new Board(config);

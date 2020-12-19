@@ -1,6 +1,7 @@
-import { createSegment } from "./segment";
-import { createWord } from "./word";
 import Trie from "../classes/Trie";
+
+import createSegment from "./segment";
+import createWord from "./word";
 
 class Placement {
   constructor({ index, placements, segment, state, word }) {
@@ -10,9 +11,11 @@ class Placement {
     this.state = state;
     this.word = word;
   }
+
   getDelta() {
     return this.placements[this.index];
   }
+
   getNext() {
     const index = this.index ? this.index + 1 : 1;
     const placements = this.placements;
@@ -39,12 +42,11 @@ class Placement {
     }
     return new Placement({ index, placements, segment, state, word });
   }
+
   getPlacedTiles() {
     return this.placements[this.index].tiles;
   }
-  getState() {
-    return this.state;
-  }
+
   init() {
     const { down, pattern, perps } = this.segment.getData();
     const placements = [];
@@ -98,7 +100,7 @@ class Placement {
   }
 }
 
-export const createPlacement = ({ index, placements, segment, state, word }) => {
+export default ({ index, placements, segment, state, word }) => {
   segment = segment || createSegment({ state });
   if (!segment) {
     return false;

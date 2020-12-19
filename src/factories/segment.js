@@ -7,15 +7,19 @@ class Segment {
     this.segments = segments;
     this.state = state;
   }
+
   allows(word) {
     return this.segments[this.index].pattern.test(word);
   }
+
   getCounts() {
     return this.segments[this.index].counts;
   }
+
   getData() {
     return this.segments[this.index];
   }
+
   getNext() {
     const { index, segments, state } = this;
     if (index === segments.length - 1) {
@@ -23,6 +27,7 @@ class Segment {
     }
     return new Segment({ index: index + 1, segments, state });
   }
+
   init() {
     this.index = 0;
     const boardArr = this.state.getBoard().getArray();
@@ -89,7 +94,7 @@ class Segment {
   }
 }
 
-export const createSegment = ({ state }) => {
+export default ({ state }) => {
   const segment = new Segment({ state });
   if (!segment.init()) {
     return false;

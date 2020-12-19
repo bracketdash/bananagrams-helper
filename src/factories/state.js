@@ -1,17 +1,17 @@
-import { createPlacement } from "./placement";
+import { BOARD } from "./util/symbols";
+
+import createPlacement from "./placement";
 
 class State {
-  constructor({ board, parent, placement, solve, tray }) {
-    this.board = board;
-    this.parent = parent;
-    this.solve = solve;
-    this.tray = tray || solve.getTray();
-    this.placement = placement || createPlacement({ state: this });
+  constructor(config) {
+    this.data = config;
   }
+  
   getAdvanced() {
-    // TODO: FIX
-    console.log("createPlacement 2 -- 'yo' tray shouldn't make it here");
-    const placement = createPlacement({ state: this });
+    const placementData = new Map();
+    // TODO: START HERE
+    placementData.set();
+    const placement = createPlacement(placementData);
     if (!placement) {
       return false;
     }
@@ -22,9 +22,11 @@ class State {
       tray: this.tray.getNext(placement.getPlacedTiles()),
     });
   }
+  
   getBoard() {
-    return this.board;
+    return this.data.get(BOARD);
   }
+  
   getNext() {
     const parent = this.parent;
     if (!parent) {
@@ -46,21 +48,22 @@ class State {
       tray: this.tray.getNext(placement.getPlacedTiles()),
     });
   }
+  
   getPlacement() {
     return this.placement;
   }
+  
   getPrev() {
     return this.previous;
   }
-  getSolve() {
-    return this.solve;
-  }
+  
   getTray() {
     return this.tray;
   }
+  
   isSolved() {
     return this.tray.isEmpty();
   }
 }
 
-export const createState = (config) => new State(config);
+export default (config) => new State(config);

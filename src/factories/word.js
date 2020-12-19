@@ -125,7 +125,7 @@ class Word {
   }
 }
 
-export const createWord = ({ segment, state }) => {
+export default ({ segment, state }) => {
   const word = new Word({ segment, state });
   if (!word.init()) {
     return false;

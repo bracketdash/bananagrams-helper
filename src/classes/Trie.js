@@ -24,9 +24,11 @@ class Trie {
     };
     return loop(this.data, word);
   }
+  
   getData() {
     return this.data;
   }
+  
   init() {
     return new Promise((resolve) => {
       fetch(wordsTxt.slice(1)).then(async (response) => {
