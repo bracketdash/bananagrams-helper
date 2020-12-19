@@ -1,4 +1,5 @@
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
+import Trie from "../classes/Trie";
 
 class Word {
   constructor({ branch, parts, segment, state, word }) {
@@ -9,7 +10,6 @@ class Word {
     this.segment = segment;
     this.state = state;
     this.tray = state.getTray();
-    this.trie = solve.getSolver().getTrie();
     this.word = word;
     this.wordArr = word ? word.split("") : [];
   }
@@ -92,7 +92,7 @@ class Word {
         return loop(parts.slice(), branch);
       }
     };
-    return loop(this.parts ? this.parts.slice() : [""], this.branch || this.trie.getData());
+    return loop(this.parts ? this.parts.slice() : [""], this.branch || Trie.getData());
   }
   getString() {
     return this.word;

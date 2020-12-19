@@ -1,10 +1,4 @@
-export const getLetterCounts = (str) =>
-  str.split("").reduce((counts, letter) => {
-    counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-    return counts;
-  }, new Map());
-
-export const getPatterns = (tiles) => {
+export default (tiles) => {
   const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
   const moddedPatternTest = /[a-z]+[^a-z]+[a-z]+/;
   const loop = (fullPattern, patterns, leftTrim, rightTrim, tilesLeftTrim) => {

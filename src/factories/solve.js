@@ -11,9 +11,6 @@ class Solve {
   getBlacklist() {
     return this.blacklist;
   }
-  getSolver() {
-    return this.solver;
-  }
   getTray() {
     return this.tray;
   }

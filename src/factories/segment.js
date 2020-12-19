@@ -1,4 +1,5 @@
-import { getLetterCounts, getPatterns } from "./utilities";
+import getLetterCounts from "../util/getLetterCounts";
+import getPatterns from "../util/getPatterns";
 
 class Segment {
   constructor({ index, segments, state }) {

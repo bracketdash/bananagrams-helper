@@ -1,5 +1,6 @@
 import { createSegment } from "./segment";
 import { createWord } from "./word";
+import Trie from "../classes/Trie";
 
 class Placement {
   constructor({ index, placements, segment, state, word }) {
@@ -7,7 +8,6 @@ class Placement {
     this.placements = placements;
     this.segment = segment;
     this.state = state;
-    this.trie = state.getSolve().getSolver().getTrie();
     this.word = word;
   }
   getDelta() {
@@ -66,7 +66,7 @@ class Placement {
           const perpIndex = start + letterIndex;
           if (perps.has(perpIndex)) {
             const { left, right } = perps.get(perpIndex);
-            if (!this.trie.contains(`${left || ""}${letter}${right || ""}`)) {
+            if (!Trie.contains(`${left || ""}${letter}${right || ""}`)) {
               return true;
             }
           }

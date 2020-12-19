@@ -1,4 +1,4 @@
-import { getLetterCounts } from "./utilities";
+import getLetterCounts from "../util/getLetterCounts";
 
 class Tray {
   constructor(str) {
