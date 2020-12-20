@@ -1,10 +1,7 @@
-// Steps 3, 4, & 5 are UNDER CONSTRUCTION - see step-4-placement.js for details
+// TODO: maps & symbols
 
-import { isAWord } from "../util/trie";
 import getLetterCounts from "../util/getLetterCounts";
 import getPatterns from "../util/getPatterns";
-
-import createWord from "./step-5-word";
 
 class Segment {
   constructor({ index, segments, state }) {

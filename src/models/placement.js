@@ -1,17 +1,9 @@
-// Steps 3, 4, & 5 are UNDER CONSTRUCTION - see below for details
-/*
+// TODO: maps & symbols
 
-Slight refactor of these final 3 steps...
+import { isAWord } from "../util/trie";
 
-Placement should only need to care about getting the next word from the current segment
-If the current segment is out of words (i.e. returns false), then we try the next segment, etc.
-The segment should worry about what words belong to it
-
-(also need to finish doing our map & symbol conversion for these 3 files)
-
-*/
-
-import createSegment from "./step-4-segment";
+import createSegment from "./segment";
+import createWord from "./word";
 
 class Placement {
   constructor({ index, placements, segment, state, word }) {

@@ -2,8 +2,8 @@ import { BLACKLIST, BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, TRAY_STRING, U
 
 import { downloadAndUnPackTrie } from "../util/trie";
 
-import createSolve from "./step-1-solve";
-import createTray from "../data/tray";
+import createSolve from "./solve";
+import createTray from "./tray";
 
 class Solver {
   constructor() {

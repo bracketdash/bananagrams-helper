@@ -5,7 +5,7 @@ import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
 import Blacklist from "./blacklist";
 import Tray from "./tray";
 
-import { onUpdate } from "../solver";
+import { onUpdate } from "../models/solver";
 
 export default () => {
   const [boardArr, setBoardArr] = useState([[" "]]);
