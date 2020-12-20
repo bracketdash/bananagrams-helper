@@ -1,4 +1,4 @@
-// Steps 4, 5, & 6 are UNDER CONSTRUCTION - see below for details
+// Steps 3, 4, & 5 are UNDER CONSTRUCTION - see below for details
 /*
 
 Slight refactor of these final 3 steps...
@@ -11,7 +11,7 @@ The segment should worry about what words belong to it
 
 */
 
-import createSegment from "./segment";
+import createSegment from "./step-4-segment";
 
 class Placement {
   constructor({ index, placements, segment, state, word }) {
