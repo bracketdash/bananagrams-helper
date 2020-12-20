@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import solver from "../solver";
+import { solve } from "../solver";
 
 export default (props) => {
   const [trayStr, setTrayStr] = useState("");
@@ -8,7 +8,7 @@ export default (props) => {
   const updateTrayStr = (event) => {
     const newTrayStr = event.target.value.replace(/[^A-Z]/gi, "").toLowerCase();
     setTrayStr(newTrayStr);
-    solver.solve(newTrayStr);
+    solve(newTrayStr);
   };
 
   return (
