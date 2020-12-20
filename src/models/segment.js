@@ -57,7 +57,7 @@ class Segment {
       });
       return cols.join("");
     });
-    // TODO: move this out of the class
+    // TODO: abstract out to ../util/produceSegments (add any needed args)
     const produceSegments = (str, index, down) => {
       const trimmedLeft = str.trimLeft();
       const trimmed = trimmedLeft.trimRight();

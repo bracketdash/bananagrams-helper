@@ -72,6 +72,7 @@ class Placement {
 
   init() {
     // TODO: maps & symbols
+    // TODO: abstract out to ../util/getPlacements
     
     const { down, pattern, perps } = this.segment.getData();
     const placements = [];
