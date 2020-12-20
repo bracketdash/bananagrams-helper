@@ -5,7 +5,7 @@ import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
 import Blacklist from "./blacklist";
 import Tray from "./tray";
 
-import solver from "../solver";
+import { onUpdate } from "../solver";
 
 export default () => {
   const [boardArr, setBoardArr] = useState([[" "]]);
@@ -19,7 +19,7 @@ export default () => {
   setters.set(READY, setReady);
   setters.set(TRAY, setRemainingTray);
 
-  solver.onUpdate((update) => {
+  onUpdate((update) => {
     update.keys().forEach((key) => {
       setters.get(key)(update.get(key));
     });
