@@ -1,25 +1,31 @@
-const labels = [
-  "BLACKLIST_STRING",
-  "BLACKLIST",
-  "BRANCHES",
-  "COLUMN_INDEX",
-  "CURRENT_SOLVE",
-  "FINISHES_WORD",
-  "IS_DOWN",
-  "NUMBER_OF_COLUMNS",
-  "NUMBER_OF_ROWS",
-  "PARENT_BRANCH",
-  "READY",
-  "ROW_INDEX",
-  "ROWS",
-  "TRAY_STRING",
-  "TRAY",
-  "UPDATE_DATA",
-  "UPDATE_FUNCTION",
-  "WORD_ARRAY",
-];
-const symbols = {};
-labels.forEach((label) => {
-  symbols[label] = Symbol(label);
-});
-export default symbols;
+export const BLACKLIST_STRING = Symbol("BLACKLIST_STRING");
+export const BLACKLIST = Symbol("BLACKLIST");
+export const BOARD = Symbol("BOARD");
+export const BOARD_ARRAY = Symbol("BOARD_ARRAY");
+export const BRANCHES = Symbol("BRANCHES");
+export const COLUMN_INDEX = Symbol("COLUMN_INDEX");
+export const CURRENT_SOLVE = Symbol("CURRENT_SOLVE");
+export const FINISHES_WORD = Symbol("FINISHES_WORD");
+export const IS_DOWN = Symbol("IS_DOWN");
+export const LETTER_COUNTS = Symbol("LETTER_COUNTS");
+export const MESSAGE = Symbol("MESSAGE");
+export const NUMBER_OF_COLUMNS = Symbol("NUMBER_OF_COLUMNS");
+export const NUMBER_OF_ROWS = Symbol("NUMBER_OF_ROWS");
+export const PARENT_BRANCH = Symbol("PARENT_BRANCH");
+export const PARENT_STATE = Symbol("PARENT_STATE");
+export const PLACEMENT = Symbol("PLACEMENT");
+export const PLACEMENTS_ARRAY = Symbol("PLACEMENTS_ARRAY");
+export const PLACEMENT_INDEX = Symbol("PLACEMENT_INDEX");
+export const READY = Symbol("READY");
+export const ROW_INDEX = Symbol("ROW_INDEX");
+export const ROWS = Symbol("ROWS");
+export const SEGMENT = Symbol("SEGMENT");
+export const TILES_ARRAY = Symbol("TILES_ARRAY");
+export const TRAY_STRING = Symbol("TRAY_STRING");
+export const TRAY = Symbol("TRAY");
+export const UPDATE_DATA = Symbol("UPDATE_DATA");
+export const UPDATE_FUNCTION = Symbol("UPDATE_FUNCTION");
+export const WORD = Symbol("WORD");
+export const WORD_ARRAY = Symbol("WORD_ARRAY");
+export const WORDLIST_SET = Symbol("WORDLIST_SET");
+export const WORDLIST_DYNAMIC = Symbol("WORDLIST_DYNAMIC");

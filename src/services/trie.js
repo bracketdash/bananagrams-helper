@@ -1,7 +1,7 @@
-import { WORDLIST_SET } from "./symbols";
-import decode from "./decode";
-import processNode from "./processNode";
-import processWords from "./processWords"
+import { WORDLIST_SET } from "../util/symbols";
+import decode from "../util/decode";
+import processNode from "../util/processNode";
+import processWords from "../util/processWords";
 
 import wordsTxt from "../assets/words.txt";
 

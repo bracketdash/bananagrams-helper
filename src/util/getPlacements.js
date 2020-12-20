@@ -1,5 +1,5 @@
-import { SEGMENT, WORD } from "./symbols";
-import { isAWord } from "./trie";
+import { SEGMENT, WORD } from "../util/symbols";
+import { isAWord } from "../services/trie";
 
 export default (config) => {
   const placements = [];

@@ -1,7 +1,5 @@
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 
-import { trieRoot } from "../services/trie";
-
 // TODO
 
 export default () => {

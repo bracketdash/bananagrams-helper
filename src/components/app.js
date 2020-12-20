@@ -20,7 +20,7 @@ export default () => {
   setters.set(TRAY, setRemainingTray);
 
   onUpdate((update) => {
-    update.keys().forEach((key) => {
+    [...update.keys()].forEach((key) => {
       setters.get(key)(update.get(key));
     });
   });

@@ -25,7 +25,7 @@ const processNode = (index, sofar, nodes, syms, wordlistSet) => {
     processNode(nextIndex, newSofar, nodes, syms, wordlistSet);
     i += 2;
   }
-  return branch;
+  return wordlistSet;
 };
 
 export default processNode;
