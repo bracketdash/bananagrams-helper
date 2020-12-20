@@ -1,16 +1,9 @@
-import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 import decode from "./decode";
 
-export default (index, parentBranch, nodes, syms) => {
+const processNode = (index, sofar, nodes, syms, wordlistSet) => {
   let node = nodes[index];
-  const branch = new Map();
-  const branches = new Map();
-  branch.set(BRANCHES, branches);
-  if (parentBranch) {
-    branch.set(PARENT_BRANCH, parentBranch);
-  }
   if (node[0] === "!") {
-    branch.set(FINISHES_WORD, true);
+    wordlistSet.add(sofar);
     node = node.slice(1);
   }
   const matches = node.split(/([A-Z0-9,]+)/g);
@@ -21,15 +14,18 @@ export default (index, parentBranch, nodes, syms) => {
       i += 2;
       continue;
     }
+    const newSofar = sofar + part;
     const ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      branches.set(part, new Map([[FINISHES_WORD, true]]));
+      wordlistSet.add(newSofar);
       i += 2;
       continue;
     }
     const nextIndex = syms.has(ref) ? syms.get(ref) : index + decode(ref) + 1 - syms.size;
-    branches.set(part, processNode(nextIndex, branch, nodes, syms));
+    processNode(nextIndex, newSofar, nodes, syms, wordlistSet);
     i += 2;
   }
   return branch;
 };
+
+export default processNode;

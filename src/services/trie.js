@@ -1,10 +1,11 @@
-import { BRANCHES, FINISHES_WORD } from "./symbols";
+import { WORDLIST_SET } from "./symbols";
 import decode from "./decode";
 import processNode from "./processNode";
+import processWords from "./processWords"
 
 import wordsTxt from "../assets/words.txt";
 
-export const trieRoot = new Map();
+const data = new Map();
 
 export const downloadAndUnPackTrie = () => {
   return new Promise((resolve) => {
@@ -21,30 +22,19 @@ export const downloadAndUnPackTrie = () => {
         return false;
       });
       nodes = nodes.slice(syms.size);
-      trieRoot.set(BRANCHES, processNode(0, trieRoot, nodes, syms).get(BRANCHES));
+      const wordlistSet = processNode(0, "", nodes, syms, new Set());
+      data.set(WORDLIST_SET, wordlistSet);
+      console.log(wordlistSet);
+      // data.set(WORDLIST_DYNAMIC, processWords(wordlistSet));
       resolve();
     });
   });
 };
 
+export const getWordsForSegment = () => {
+  // TODO
+};
+
 export const isAWord = (word) => {
-  const loop = (trie, str) => {
-    if (
-      [...trie.keys()].some((part) => {
-        if (str.startsWith(part)) {
-          str = str.replace(part, "");
-          trie = trie.get(str);
-          return true;
-        }
-        return false;
-      })
-    ) {
-      if (trie.has(FINISHES_WORD)) {
-        return true;
-      }
-      return loop(trie, str);
-    }
-    return false;
-  };
-  return loop(trieRoot, word);
+  return this.data.get(WORDLIST_SET).has(word);
 };
