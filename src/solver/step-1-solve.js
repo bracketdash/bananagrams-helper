@@ -1,7 +1,7 @@
 import { BLACKLIST, BOARD, BOARD_ARRAY, CURRENT_SOLVE, MESSAGE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
 
-import createBoard from "./board";
-import createState from "./state";
+import createBoard from "../data/board";
+import createState from "./step-2-state";
 
 class Solve {
   constructor(config) {
