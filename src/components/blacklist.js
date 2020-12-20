@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import solver from "../solver";
+import { solve } from "../solver";
 
 export default (props) => {
   const [blacklistStr, setBlacklistStr] = useState("");
@@ -8,7 +8,7 @@ export default (props) => {
   const updateBlacklistStr = (event) => {
     const newBlacklistStr = event.target.value.replace(/[^A-Z,]/gi, "").toLowerCase();
     setBlacklistStr(newBlacklistStr);
-    solver.solve(false, newBlacklistStr);
+    solve(false, newBlacklistStr);
   };
 
   return (
