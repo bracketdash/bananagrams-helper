@@ -5,7 +5,7 @@ import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
 import Blacklist from "./blacklist";
 import Tray from "./tray";
 
-import solver from "../worker-chain/step-1-solver";
+import solver from "../solver";
 
 export default () => {
   const [boardArr, setBoardArr] = useState([[" "]]);
