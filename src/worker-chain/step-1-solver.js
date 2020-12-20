@@ -22,19 +22,24 @@ class Solver {
 
   solve(trayStr, blacklistStr) {
     const $data = this.data;
+    
     if (blacklistStr) {
       $data.set(BLACKLIST_STRING, blacklistStr);
     } else if (!$data.has(BLACKLIST_STRING)) {
       $data.set(BLACKLIST_STRING, "");
     }
+    
     if (trayStr) {
       $data.set(TRAY_STRING, blacklistStr);
     } else if (!$data.has(TRAY_STRING)) {
       $data.set(TRAY_STRING, "");
     }
+    
     const solveConfig = new Map();
-    solveConfig.set(BLACKLIST, createBlacklist($data.get(BLACKLIST_STRING)));
+    
+    solveConfig.set(BLACKLIST, new Set($data.get(BLACKLIST_STRING).split(/\s*,\s*/)));
     solveConfig.set(TRAY, createTray($data.get(TRAY_STRING)));
+    
     solveConfig.set(UPDATE_FUNCTION, (data) => {
       if ($data.get(CURRENT_SOLVE) === data.get(CURRENT_SOLVE)) {
         $data.get(UPDATE_FUNCTION)(data.get(UPDATE_DATA));
@@ -42,6 +47,7 @@ class Solver {
       }
       return false;
     });
+    
     $data.set(CURRENT_SOLVE, createSolve(solveConfig));
   }
 }
