@@ -16,12 +16,14 @@ class Word {
     this.word = word;
     this.wordArr = word ? word.split("") : [];
   }
+
   getArray() {
     if (!this.wordArr.length) {
       this.wordArr = this.word.split("");
     }
     return this.wordArr;
   }
+
   getNext() {
     const result = this.getNextValidWord();
     if (!result) {
@@ -35,6 +37,7 @@ class Word {
       word: result.word,
     });
   }
+
   getNextValidWord() {
     const loop = (parts, branch) => {
       const inception = (branch, parts) => {
@@ -96,9 +99,11 @@ class Word {
     };
     return loop(this.parts ? this.parts.slice() : [""], this.branch || trieRoot);
   }
+
   getString() {
     return this.word;
   }
+
   init() {
     const result = this.getNextValidWord();
     if (!result) {
@@ -110,6 +115,7 @@ class Word {
     this.wordArr = result.word.split("");
     return true;
   }
+
   partMeetsCriteria(part) {
     const counts = this.tray.getCountsWith(this.segment.getCounts());
     while (part.length > 0) {
