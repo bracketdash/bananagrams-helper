@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import solver from "../worker-chain/step-1-solver";
+import solver from "../solver";
 
 export default (props) => {
   const [trayStr, setTrayStr] = useState("");
