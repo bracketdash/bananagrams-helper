@@ -2,25 +2,30 @@ import { SEGMENT, WORD } from "./symbols";
 import { isAWord } from "./trie";
 
 export default (config) => {
-  const segment = config.get(SEGMENT);
-  const word = config.get(WORD);
-  
-  // TODO: START HERE
-  
-  const { down, pattern, perps } = this.segment.getData();
   const placements = [];
-  const wordArr = this.word.getArray();
-  const wordStr = this.word.getString();
-  let { col, row } = this.segment.getData();
+  
+  const segment = config.get(SEGMENT);
+  const segmentData = segment.getData();
+  const down = segmentData.get(IS_DOWN);
+  const perps = segmentData.get(PERPINDICULARS);
+  let col = segmentData.get(COLUMN_INDEX);
+  let row = segmentData.get(ROW_INDEX);
+  
+  const word = config.get(WORD);
+  const wordArr = word.getArray();
+  const wordStr = word.getString();
+  
   let index = 0;
   let lastIndex;
   let start;
+  
   while (index > -1 && index < wordStr.length - 1) {
     lastIndex = index;
-    index = wordStr.slice(index).search(pattern);
+    index = wordStr.slice(index).search(segmentData.get(PATTERN));
     if (index === -1) {
       continue;
     }
+    
     start = (down ? row : col) - index;
     if (
       wordArr.some((letter, letterIndex) => {
@@ -41,14 +46,22 @@ export default (config) => {
     } else {
       row = row + start;
     }
+    
     let tiles = wordStr;
-    this.segment.getCounts().forEach((count, letter) => {
+    segment.getCounts().forEach((count, letter) => {
       [...Array(count).keys()].forEach(() => {
         tiles = tiles.replace(letter, "");
       });
     });
-    tiles = tiles.split("");
-    placements.push({ col, down, row, tiles, wordArr });
+    
+    const placement = new Map();
+    placement.set(COLUMN_INDEX, col);
+    placement.set(IS_DOWN, down);
+    placement.set(ROW_INDEX, row);
+    placement.set(TILES_ARRAY, tiles.split(""));
+    placement.set(WORD_ARRAY, wordArr);
+    placements.push(placement);
+    
     index = lastIndex + (index || 1);
   }
   return placements;
