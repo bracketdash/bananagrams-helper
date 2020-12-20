@@ -1,4 +1,4 @@
-// Steps 4, 5, & 6 are UNDER CONSTRUCTION - see step-4-placement.js for details
+// Steps 3, 4, & 5 are UNDER CONSTRUCTION - see step-4-placement.js for details
 
 import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
 
