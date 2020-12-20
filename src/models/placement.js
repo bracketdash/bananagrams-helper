@@ -1,55 +1,78 @@
-// TODO: maps & symbols
-
+import { BLACKLIST, BOARD, PLACEMENTS_ARRAY, PLACEMENT_INDEX, SEGMENT, TILES_ARRAY, TRAY, WORD } from "./util/symbols";
 import { isAWord } from "../util/trie";
 
 import createSegment from "./segment";
 import createWord from "./word";
 
 class Placement {
-  constructor({ index, placements, segment, state, word }) {
-    this.index = index;
-    this.placements = placements;
-    this.segment = segment;
-    this.state = state;
-    this.word = word;
+  constructor(config) {
+    this.data = config;
   }
 
   getDelta() {
-    return this.placements[this.index];
+    const $data = this.data;
+    return $data.get(PLACEMENTS_ARRAY)[$data.get(PLACEMENT_INDEX)];
   }
 
   getNext() {
-    const index = this.index ? this.index + 1 : 1;
-    const placements = this.placements;
-    const state = this.state;
-    if (index < this.placements.length) {
-      return new Placement({ index, placements, segment: this.segment, state, word: this.word });
+    const $data = this.data;
+    const index = $data.has(PLACEMENT_INDEX) ? $data.get(PLACEMENT_INDEX) + 1 : 1;
+    const placements = $data.get(PLACEMENTS_ARRAY) || [];
+    const blacklist = $data.get(BLACKLIST);
+    const tray = $data.get(TRAY);
+    
+    const config = new Map();
+    config.set(BLACKLIST, blacklist);
+    config.set(BOARD, $data.get(BOARD));
+    config.set(TRAY, tray);
+    
+    if (index < placements.length) {
+      config.set(PLACEMENT_INDEX, index);
+      config.set(PLACEMENTS_ARRAY, placements);
+      config.set(SEGMENT, $data.get(SEGMENT));
+      config.set(WORD, $data.get(WORD));
+      return new Placement(config);
     }
+    
     let word = this.word.getNext();
     if (word) {
-      return new Placement({ index, placements, segment: this.segment, state, word });
+      config.set(SEGMENT, $data.get(SEGMENT));
+      config.set(WORD, word);
+      return new Placement(config);
     }
+    
     let segment = this.segment.getNext();
     if (!segment) {
       return false;
     }
-    word = createWord({ segment, state: this.state });
+    
+    const wordConfig = new Map();
+    wordConfig.set(BLACKLIST, blacklist);
+    wordConfig.set(SEGMENT, segment);
+    wordConfig.set(TRAY, tray);
+    word = createWord(wordConfig);
     while (!word) {
       segment = segment.getNext();
       if (segment) {
-        word = createWord({ segment, state: this.state });
+        wordConfig.set(SEGMENT, segment);
+        word = createWord(wordConfig);
       } else {
         return false;
       }
     }
-    return new Placement({ index, placements, segment, state, word });
+    config.set(SEGMENT, segment);
+    config.set(WORD, word);
+    return new Placement(config);
   }
 
   getPlacedTiles() {
-    return this.placements[this.index].tiles.split("");
+    const $data = this.data;
+    return $data.get(PLACEMENTS_ARRAY)[$data.get(PLACEMENT_INDEX)].get(TILES_ARRAY);
   }
 
   init() {
+    // TODO: maps & symbols
+    
     const { down, pattern, perps } = this.segment.getData();
     const placements = [];
     const wordArr = this.word.getArray();
@@ -118,9 +141,15 @@ export default (config) => {
     return false;
   }
   
-  const newPlacement = new Placement({ index, placements, segment, state, word });
-  if (!newPlacement.init()) {
+  const placementConfig = new Map();
+  placementConfig.set(BLACKLIST, config.get(BLACKLIST));
+  placementConfig.set(BOARD, config.get(BOARD));
+  placementConfig.set(SEGMENT, segment);
+  placementConfig.set(TRAY, config.get(TRAY));
+  placementConfig.set(WORD, word);
+  const placement = new Placement(placementConfig);
+  if (!placement.init()) {
     return false;
   }
-  return newPlacement;
+  return placement;
 };
