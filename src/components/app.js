@@ -1,11 +1,10 @@
 import { useState } from "react";
 
 import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
+import { onUpdate } from "../util/solver";
 
 import Blacklist from "./blacklist";
 import Tray from "./tray";
-
-import { onUpdate } from "../models/solver";
 
 export default () => {
   const [boardArr, setBoardArr] = useState([[" "]]);
