@@ -1,8 +1,8 @@
+import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "../util/symbols";
+
+import { trieRoot } from "../services/trie";
+
 // TODO: maps & symbols
-
-import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
-
-import { trieRoot } from "../util/trie";
 
 class Word {
   constructor({ branch, parts, segment, state, word }) {

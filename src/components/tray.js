@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { solve } from "../util/solver";
+import { solve } from "../services/solver";
 
 export default (props) => {
   const [trayStr, setTrayStr] = useState("");

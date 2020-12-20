@@ -1,9 +1,8 @@
-import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
+import { BRANCHES, FINISHES_WORD } from "./symbols";
+import decode from "./decode";
+import processNode from "./processNode";
 
 import wordsTxt from "../assets/words.txt";
-
-import processNode from "../util/processNode";
-import decode from "../util/decode";
 
 export const trieRoot = new Map();
 

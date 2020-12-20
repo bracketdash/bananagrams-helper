@@ -1,4 +1,4 @@
-import { BLACKLIST, BOARD, PARENT_STATE, PLACEMENT, TRAY } from "./util/symbols";
+import { BLACKLIST, BOARD, PARENT_STATE, PLACEMENT, TRAY } from "../util/symbols";
 
 import createPlacement from "./placement";
 

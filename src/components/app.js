@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "./util/symbols";
-import { onUpdate } from "../util/solver";
+import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "../util/symbols";
+
+import { onUpdate } from "../services/solver";
 
 import Blacklist from "./blacklist";
 import Tray from "./tray";

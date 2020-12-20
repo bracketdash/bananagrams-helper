@@ -1,4 +1,4 @@
-import { BLACKLIST, BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, TRAY_STRING, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
+import { BLACKLIST, BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, TRAY_STRING, UPDATE_DATA, UPDATE_FUNCTION } from "../util/symbols";
 
 import { downloadAndUnPackTrie } from "./trie";
 

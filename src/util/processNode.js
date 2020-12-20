@@ -1,3 +1,6 @@
+import { BRANCHES, FINISHES_WORD, PARENT_BRANCH } from "./symbols";
+import decode from "./decode";
+
 export default (index, parentBranch, nodes, syms) => {
   let node = nodes[index];
   const branch = new Map();

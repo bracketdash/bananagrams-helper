@@ -1,4 +1,4 @@
-import { BLACKLIST, BOARD, BOARD_ARRAY, CURRENT_SOLVE, MESSAGE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "./util/symbols";
+import { BLACKLIST, BOARD, BOARD_ARRAY, CURRENT_SOLVE, MESSAGE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "../util/symbols";
 
 import createBoard from "./board";
 import createState from "./state";
