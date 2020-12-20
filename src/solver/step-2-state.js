@@ -1,6 +1,6 @@
 import { BLACKLIST, BOARD, PARENT_STATE, PLACEMENT, TRAY } from "./util/symbols";
 
-import createPlacement from "./placement";
+import createPlacement from "./step-3-placement";
 
 class State {
   constructor(config) {
