@@ -38,7 +38,7 @@ class Placement {
     if (word) {
       config.set(SEGMENT, $data.get(SEGMENT));
       config.set(WORD, word);
-      return new Placement(config);
+      return new Placement(config).init();
     }
     
     let segment = this.segment.getNext();
@@ -62,7 +62,7 @@ class Placement {
     }
     config.set(SEGMENT, segment);
     config.set(WORD, word);
-    return new Placement(config);
+    return new Placement(config).init();
   }
 
   getPlacedTiles() {
@@ -122,7 +122,7 @@ class Placement {
     }
     this.index = 0;
     this.placements = placements;
-    return true;
+    return this;
   }
 }
 
@@ -147,9 +147,5 @@ export default (config) => {
   placementConfig.set(SEGMENT, segment);
   placementConfig.set(TRAY, config.get(TRAY));
   placementConfig.set(WORD, word);
-  const placement = new Placement(placementConfig);
-  if (!placement.init()) {
-    return false;
-  }
-  return placement;
+  return new Placement(placementConfig).init();
 };
