@@ -51,12 +51,11 @@ const processNode = (index, sofar) => {
 
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
-  const letterCounts = wordArr.reduce((counts, letter) => {
+  const wordSymbol = Symbol();
+  wordArr.reduce((counts, letter) => {
     counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
     return counts;
-  }, new Map());
-  const wordSymbol = Symbol();
-  letterCounts.forEach((instances, letter) => {
+  }, new Map()).forEach((instances, letter) => {
     if (!byLetterCount.has(letter)) {
       byLetterCount.set(letter, new Map());
     }
@@ -70,7 +69,7 @@ const processWord = (wordStr) => {
     });
   });
   wordlistSet.add(wordStr);
-  wordSymbols.set(wordSymbol, { letterCounts, wordStr, wordArr });
+  wordSymbols.set(wordSymbol, { wordStr, wordArr });
 };
 
 export const downloadAndUnpackTrie = () => {
