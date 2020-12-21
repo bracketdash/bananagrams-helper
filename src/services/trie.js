@@ -108,12 +108,15 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
       wordSet.delete(word);
     }
   });
+  const words = new Map();
+  let wordIndex = 0;
   wordSet.forEach((word) => {
-    if (!segment.allows(word)) {
-      wordSet.delete(word);
+    if (segment.allows(word.wordStr)) {
+      words.set(wordIndex, word);
+      wordIndex++;
     }
   });
-  // TODO: return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
+  return words;
 };
 
 export const isAWord = wordlistSet.has;
