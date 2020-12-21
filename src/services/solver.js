@@ -1,13 +1,13 @@
 import { BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
-import { downloadAndUnpackTrie } from "./trie";
+import { downloadAndUnpackWords } from "./words";
 
 import createSolve from "../models/solve";
 import createTray from "../models/tray";
 
 const data = new Map();
 
-downloadAndUnpackTrie().then(() => {
+downloadAndUnpackWords().then(() => {
   const updateConfig = new Map();
   updateConfig.set(READY, true);
   data.set(READY, true);
@@ -18,7 +18,7 @@ export const onUpdate = (update) => {
   data.set(UPDATE_FUNCTION, update);
 };
 
-export const solve = (trayStr, blacklistStr) => {
+export const solve = async (trayStr, blacklistStr) => {
   if (blacklistStr) {
     data.set(BLACKLIST_STRING, blacklistStr);
   } else if (!data.has(BLACKLIST_STRING)) {
@@ -37,7 +37,7 @@ export const solve = (trayStr, blacklistStr) => {
 
   data.set(
     CURRENT_SOLVE,
-    createSolve(new Set(data.get(BLACKLIST_STRING).split(/\s*,\s*/)), createTray(data.get(TRAY)), (solve, update) => {
+    await createSolve(new Set(data.get(BLACKLIST_STRING).split(/\s*,\s*/)), createTray(data.get(TRAY)), (solve, update) => {
       if (data.get(CURRENT_SOLVE) === solve) {
         data.get(UPDATE_FUNCTION)(update);
         return true;

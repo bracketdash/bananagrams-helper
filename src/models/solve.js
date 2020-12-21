@@ -18,20 +18,20 @@ class Solve {
     return this.update(this, updateData);
   }
 
-  init() {
-    this.step(createState(this.blacklist, createBoard(), this.tray));
+  async init() {
+    await this.step(await createState(this.blacklist, createBoard(), this.tray));
   }
 
-  step(state) {
+  async step(state) {
     if (state.isSolved()) {
       this.handleUpdate(state, "Solution found!");
       return;
     }
-    if (!this.tryNextStep(state.getAdvanced(), "Advancing state...")) {
-      if (!this.tryNextStep(state.getNext(), "Trying next state...")) {
+    if (!this.tryNextStep(await state.getAdvanced(), "Advancing state...")) {
+      if (!this.tryNextStep(await state.getNext(), "Trying next state...")) {
         let prevState = state.getPrev();
         while (prevState) {
-          if (this.tryNextStep(prevState.getNext(), "Trying previous next state...")) {
+          if (this.tryNextStep(await prevState.getNext(), "Trying previous next state...")) {
             return;
           }
           prevState = prevState.getPrev();
@@ -43,15 +43,15 @@ class Solve {
 
   tryNextStep(state, message) {
     if (state && this.handleUpdate(state, message)) {
-      setTimeout(() => this.step(state));
+      setTimeout(async () => await this.step(state));
       return true;
     }
     return false;
   }
 }
 
-export default (blacklist, tray, update) => {
+export default async (blacklist, tray, update) => {
   const solve = new Solve(blacklist, tray, update);
-  solve.init();
+  await solve.init();
   return solve;
 };

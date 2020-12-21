@@ -9,8 +9,8 @@ class State {
     this.placement = placement;
   }
 
-  getAdvanced() {
-    const placement = createPlacement(this.board, this.blacklist, this.tray);
+  async getAdvanced() {
+    const placement = await createPlacement(this.board, this.blacklist, this.tray);
     if (!placement) {
       return false;
     }
@@ -21,11 +21,11 @@ class State {
     return this.board;
   }
 
-  getNext() {
+  async getNext() {
     if (!this.parent) {
       return false;
     }
-    const placement = this.parent.getPlacement().getNext();
+    const placement = await this.parent.getPlacement().getNext();
     if (!placement) {
       return false;
     }

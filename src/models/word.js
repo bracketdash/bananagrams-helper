@@ -1,4 +1,4 @@
-import { getWordsForSegment } from "../services/trie";
+import { getWordsForSegment } from "../services/words";
 
 class Word {
   constructor(blacklist, segment, tray, words, index) {
@@ -26,8 +26,8 @@ class Word {
     return this.words.get(this.index).wordStr;
   }
 
-  init() {
-    const words = getWordsForSegment(this.blacklist, this.segment, this.tray);
+  async init() {
+    const words = await getWordsForSegment(this.blacklist, this.segment, this.tray);
     if (!words.size) {
       return false;
     }
@@ -37,6 +37,6 @@ class Word {
   }
 }
 
-export default (blacklist, segment, tray) => {
-  return new Word(blacklist, segment, tray).init();
+export default async (blacklist, segment, tray) => {
+  return await new Word(blacklist, segment, tray).init();
 };

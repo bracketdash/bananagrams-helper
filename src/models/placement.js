@@ -16,7 +16,7 @@ class Placement {
     return this.placements[this.index];
   }
 
-  getNext() {
+  async getNext() {
     const blacklist = this.blacklist;
     const board = this.board;
     const index = this.index ? this.index + 1 : 1;
@@ -37,11 +37,11 @@ class Placement {
       return false;
     }
 
-    word = createWord(blacklist, segment, tray);
+    word = await createWord(blacklist, segment, tray);
     while (!word) {
       segment = segment.getNext();
       if (segment) {
-        word = createWord(blacklist, segment, tray);
+        word = await createWord(blacklist, segment, tray);
       } else {
         return false;
       }
@@ -65,12 +65,12 @@ class Placement {
   }
 }
 
-export default (board, blacklist, tray) => {
+export default async (board, blacklist, tray) => {
   const segment = createSegment(board.getArray());
   if (!segment) {
     return false;
   }
-  const word = createWord(blacklist, segment, tray);
+  const word = await createWord(blacklist, segment, tray);
   if (!word) {
     return false;
   }

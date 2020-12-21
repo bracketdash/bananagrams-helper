@@ -1,4 +1,4 @@
-import { isAWord } from "../services/trie";
+import { isAWord } from "../services/words";
 
 export default (segment, word) => {
   const placements = [];
