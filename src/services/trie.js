@@ -103,8 +103,12 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
     // TODO: create comboCache entry (alphaKey, Set({ wordArr, wordStr }, {..}, ..))
   }
   const wordSet = comboCache.get(alphaKey);
-  // TODO
-  // remove words that are on the blacklist
+  blacklist.forEach((word) => {
+    if (wordSet.has(word)) {
+      wordSet.delete(word);
+    }
+  });
+  // TODO:
   // test all the words against the segment pattern
   // return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
 };
