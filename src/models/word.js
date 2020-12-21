@@ -10,7 +10,7 @@ class Word {
   }
 
   getArray() {
-    return this.words[this.index].wordArr;
+    return this.words.get(this.index).wordArr;
   }
 
   getNext() {
@@ -23,7 +23,7 @@ class Word {
   }
 
   getString() {
-    return this.words[this.index].wordStr;
+    return this.words.get(this.index).wordStr;
   }
 
   init() {
