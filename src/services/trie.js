@@ -5,6 +5,7 @@ import getLetterCounts from "../util/getLetterCounts";
 import wordsTxt from "../assets/words.txt";
 
 const byLetterCount = new Map();
+const syms = new Map();
 const wordlistSet = new Set();
 const wordSymbols = new Map();
 
@@ -12,12 +13,14 @@ let i;
 let matches;
 let matchesLength;
 let newSofar;
+let nextIndex;
 let node;
 let nodes;
+let numSyms;
 let part;
 let ref;
 
-const processNode = (index, sofar, nodes, syms) => {
+const processNode = (index, sofar) => {
   node = nodes[index];
   if (node[0] === "!") {
     wordlistSet.add(sofar);
@@ -42,8 +45,8 @@ const processNode = (index, sofar, nodes, syms) => {
       i += 2;
       continue;
     }
-    const nextIndex = syms.has(ref) ? syms.get(ref) : index + decode(ref) + 1 - syms.size;
-    processNode(nextIndex, newSofar, nodes, syms);
+    nextIndex = syms.has(ref) ? syms.get(ref) : index + decode(ref) + 1 - numSyms;
+    processNode(nextIndex, newSofar);
     i += 2;
   }
 };
@@ -75,8 +78,7 @@ export const downloadAndUnpackTrie = () => {
   return new Promise((resolve) => {
     fetch(wordsTxt.slice(1)).then(async (response) => {
       const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
-      const syms = new Map();
-      let nodes = (await response.text()).split(";");
+      nodes = (await response.text()).split(";");
       nodes.some((node) => {
         const symParts = pattern.exec(node);
         if (!symParts) {
@@ -85,8 +87,9 @@ export const downloadAndUnpackTrie = () => {
         syms.set(symParts[1], decode(symParts[2]));
         return false;
       });
-      nodes = nodes.slice(syms.size);
-      processNode(0, "", nodes, syms);
+      numSyms = syms.size;
+      nodes = nodes.slice(numSyms);
+      processNode(0, "");
       resolve();
     });
   });
