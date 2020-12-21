@@ -104,7 +104,7 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
   // }
   // remove words that are on the blacklist
   // test all the words against the segment pattern
-  // return a map of words indexed like an array
+  // return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
 };
 
 export const isAWord = (word) => {
