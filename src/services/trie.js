@@ -108,9 +108,12 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
       wordSet.delete(word);
     }
   });
-  // TODO:
-  // test all the words against the segment pattern
-  // return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
+  wordSet.forEach((word) => {
+    if (!segment.allows(word)) {
+      wordSet.delete(word);
+    }
+  });
+  // TODO: return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
 };
 
 export const isAWord = (word) => {
