@@ -19,7 +19,6 @@ class Board {
   }
 
   getNext(delta) {
-    const $data = this.data;
     const rows = new Map();
     let newRow = delta.row;
     let newCol = delta.col;

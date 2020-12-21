@@ -1,4 +1,4 @@
-import { BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY_STRING, UPDATE_FUNCTION } from "../util/symbols";
+import { BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
 import { downloadAndUnPackTrie } from "./trie";
 
@@ -26,18 +26,18 @@ export const solve = (trayStr, blacklistStr) => {
   }
 
   if (trayStr) {
-    data.set(TRAY_STRING, blacklistStr);
-  } else if (!data.has(TRAY_STRING)) {
-    data.set(TRAY_STRING, "");
+    data.set(TRAY, blacklistStr);
+  } else if (!data.has(TRAY)) {
+    data.set(TRAY, "");
   }
 
-  if (!data.get(TRAY_STRING) || !data.get(READY)) {
+  if (!data.get(TRAY) || !data.get(READY)) {
     return;
   }
 
   data.set(
     CURRENT_SOLVE,
-    createSolve(new Set(data.get(BLACKLIST_STRING).split(/\s*,\s*/)), createTray(data.get(TRAY_STRING)), (solve, update) => {
+    createSolve(new Set(data.get(BLACKLIST_STRING).split(/\s*,\s*/)), createTray(data.get(TRAY)), (solve, update) => {
       if (data.get(CURRENT_SOLVE) === solve) {
         data.get(UPDATE_FUNCTION)(update);
         return true;
