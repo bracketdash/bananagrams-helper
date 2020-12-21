@@ -116,6 +116,4 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
   // TODO: return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
 };
 
-export const isAWord = (word) => {
-  return wordlistSet.has(word);
-};
+export const isAWord = wordlistSet.has;
