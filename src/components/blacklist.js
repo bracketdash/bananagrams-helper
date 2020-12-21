@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { solve } from "../services/solver";
 
-export default (props) => {
+export default () => {
   const [blacklistStr, setBlacklistStr] = useState("");
 
   const updateBlacklistStr = (event) => {

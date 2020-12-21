@@ -11,3 +11,6 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("app")
 );
+
+// TODO: pass data around using function arguments
+// TODO: clean up symbol imports, remove symbols we aren't using anymore
