@@ -1,47 +1,42 @@
 import { getWordsForSegment } from "../services/trie";
 
 class Word {
-  constructor(config) {
-    this.data = config;
+  constructor(blacklist, segment, tray, words, index) {
+    this.blacklist = blacklist;
+    this.segment = segment;
+    this.tray = tray;
+    this.words = words;
+    this.index = index;
   }
 
   getArray() {
-    const $data = this.data;
-    return $data.get(WORDS_MAP)[$data.get(WORD_INDEX)].get(WORD_ARRAY);
+    return this.words[this.index].wordArr;
   }
 
   getNext() {
-    const $data = this.data;
-    if ($data.get(WORDS_MAP).size < $data.get(WORD_INDEX) + 1) {
+    const indexPlusOne = this.index + 1;
+    const words = this.words;
+    if (words.size < indexPlusOne) {
       return false;
     }
-    const wordConfig = new Map();
-    wordConfig.set(BLACKLIST, $data.get(BLACKLIST));
-    wordConfig.set(SEGMENT, $data.get(SEGMENT));
-    wordConfig.set(TRAY, $data.get(TRAY));
-    wordConfig.set(WORD_INDEX, $data.get(WORD_INDEX) + 1);
-    wordConfig.set(WORDS_MAP, $data.get(WORDS_MAP));
-    return new Word(wordConfig);
+    return new Word(this.blacklist, this.segment, this.tray, words, indexPlusOne);
   }
 
   getString() {
-    const $data = this.data;
-    return $data.get(WORDS_MAP)[$data.get(WORD_INDEX)].get(WORD_STRING);
+    return this.words[this.index].wordStr;
   }
 
   init() {
-    const $data = this.data;
-    const words = getWordsForSegment($data.get(BLACKLIST), $data.get(SEGMENT), $data.get(TRAY));
+    const words = getWordsForSegment(this.blacklist, this.segment, this.tray);
     if (!words.size) {
       return false;
     }
-    const $data = this.data;
-    $data.set(WORDS_MAP, words);
-    $data.set(WORD_INDEX, 0);
+    this.index = 0;
+    this.words = words;
     return this;
   }
 }
 
-export default (config) => {
-  return new Word(config).init();
+export default (blacklist, segment, tray) => {
+  return new Word(blacklist, segment, tray).init();
 };

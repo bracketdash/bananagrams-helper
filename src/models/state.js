@@ -1,71 +1,52 @@
-import { BLACKLIST, BOARD, PARENT_STATE, PLACEMENT, TRAY } from "../util/symbols";
-
 import createPlacement from "./placement";
 
 class State {
-  constructor(config) {
-    this.data = config;
+  constructor(blacklist, board, tray, parent, placement) {
+    this.blacklist = blacklist;
+    this.board = board;
+    this.tray = tray;
+    this.parent = parent;
+    this.placement = placement;
   }
 
   getAdvanced() {
-    const $data = this.data;
-    const placement = createPlacement($data);
+    const placement = createPlacement(this.board, this.blacklist, this.tray);
     if (!placement) {
       return false;
     }
-    
-    const config = new Map();
-    config.set(BLACKLIST, $data.get(BLACKLIST));
-    config.set(BOARD, $data.get(BOARD).getNext(placement.getDelta()));
-    config.set(PARENT_STATE, this);
-    config.set(PLACEMENT, placement);
-    config.set(TRAY, $data.get(TRAY).getNext(placement.getPlacedTiles()));
-    
-    return new State(config);
+    return new State(this.blacklist, this.board.getNext(placement.getDelta()), this.tray.getNext(placement.getPlacedTiles()), this, placement);
   }
 
   getBoard() {
-    return this.data.get(BOARD);
+    return this.board;
   }
 
   getNext() {
-    const $data = this.data;
-    
-    const parent = $data.get(PARENT_STATE);
-    if (!parent) {
+    if (!this.parent) {
       return false;
     }
-    
-    const placement = parent.getPlacement().getNext();
+    const placement = this.parent.getPlacement().getNext();
     if (!placement) {
       return false;
     }
-    
-    const config = new Map();
-    config.set(BLACKLIST, $data.get(BLACKLIST));
-    config.set(BOARD, $data.get(BOARD).getNext(placement.getDelta()));
-    config.set(PARENT_STATE, this);
-    config.set(PLACEMENT, placement);
-    config.set(TRAY, $data.get(TRAY).getNext(placement.getPlacedTiles()));
-    
-    return new State(config);
+    return new State(this.blacklist, this.board.getNext(placement.getDelta()), this.tray.getNext(placement.getPlacedTiles()), this, placement);
   }
 
   getPlacement() {
-    return this.data.get(PLACEMENT);
+    return this.placement || false;
   }
 
   getPrev() {
-    return this.data.get(PARENT_STATE);
+    return this.parent || false;
   }
 
   getTray() {
-    return this.data.get(TRAY);
+    return this.tray;
   }
 
   isSolved() {
-    return this.data.get(TRAY).isEmpty();
+    return this.tray.isEmpty();
   }
 }
 
-export default (config) => new State(config);
+export default (blacklist, board, tray) => new State(blacklist, board, tray);

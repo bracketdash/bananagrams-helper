@@ -1,30 +1,25 @@
-import { BLACKLIST, BOARD, BOARD_ARRAY, CURRENT_SOLVE, MESSAGE, TRAY, UPDATE_DATA, UPDATE_FUNCTION } from "../util/symbols";
+import { BOARD_ARRAY, MESSAGE, TRAY } from "../util/symbols";
 
 import createBoard from "./board";
 import createState from "./state";
 
 class Solve {
-  constructor(config) {
-    this.data = config;
+  constructor(blacklist, tray, update) {
+    this.blacklist = blacklist;
+    this.tray = tray;
+    this.update = update;
   }
 
   handleUpdate(state, message) {
-    const data = new Map();
     const updateData = new Map();
     updateData.set(BOARD_ARRAY, state.getBoard().getArray());
     updateData.set(MESSAGE, message);
     updateData.set(TRAY, state.getTray().getString());
-    data.set(CURRENT_SOLVE, this);
-    data.set(UPDATE_DATA, updateData);
-    return this.data.get(UPDATE_FUNCTION)(data);
+    return this.update(this, updateData);
   }
 
   init() {
-    const stateConfig = new Map();
-    stateConfig.set(BLACKLIST, this.data.get(BLACKLIST));
-    stateConfig.set(BOARD, createBoard());
-    stateConfig.set(TRAY, this.data.get(TRAY));
-    this.step(createState(stateConfig));
+    this.step(createState(this.blacklist, createBoard(), this.tray));
   }
 
   step(state) {
@@ -55,8 +50,8 @@ class Solve {
   }
 }
 
-export default (config) => {
-  const solve = new Solve(config);
+export default (blacklist, tray, update) => {
+  const solve = new Solve(blacklist, tray, update);
   solve.init();
   return solve;
 };
