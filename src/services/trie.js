@@ -1,4 +1,3 @@
-import { BY_LETTER_COUNT, LETTER_COUNTS, WORD_ARRAY, WORD_STRING, WORD_SYMBOLS, WORDLIST_SET } from "../util/symbols";
 import decode from "../util/decode";
 import getLetterCounts from "../util/getLetterCounts";
 
@@ -53,7 +52,7 @@ const processNode = (index, sofar) => {
 
 const processWord = (word) => {
   const letterCounts = getLetterCounts(word);
-  const wordSymbol = Symbol(word);
+  const wordSymbol = Symbol();
   letterCounts.forEach((instances, letter) => {
     if (!byLetterCount.has(letter)) {
       byLetterCount.set(letter, new Map());
@@ -67,11 +66,7 @@ const processWord = (word) => {
       instanceMap.get(indexPlusOne).add(wordSymbol);
     });
   });
-  const wordData = new Map();
-  wordData.set(LETTER_COUNTS, letterCounts);
-  wordData.set(WORD_ARRAY, word.split(""));
-  wordData.set(WORD_STRING, word);
-  wordSymbols.set(wordSymbol, wordData);
+  wordSymbols.set(wordSymbol, { letterCounts, wordStr: word, wordArr: word.split("") });
 };
 
 export const downloadAndUnpackTrie = () => {
@@ -100,5 +95,5 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
 };
 
 export const isAWord = (word) => {
-  return data.get(WORDLIST_SET).has(word);
+  return wordlistSet.has(word);
 };
