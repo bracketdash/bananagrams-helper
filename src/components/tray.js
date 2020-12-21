@@ -13,7 +13,7 @@ export default (props) => {
 
   return (
     <div className="letterbox">
-      <input type="text" placeholder="yourtileshere" value={trayStr} onInput={updateTrayStr} disabled={!props.ready} />
+      <input type="text" placeholder="yourtileshere" value={trayStr} onInput={updateTrayStr} />
     </div>
   );
 };

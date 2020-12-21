@@ -1,4 +1,4 @@
-import getNextWord from "../util/getNextWord";
+import { getWordsForSegment } from "../services/trie";
 
 class Word {
   constructor(config) {
@@ -6,54 +6,39 @@ class Word {
   }
 
   getArray() {
-    return this.data.get(WORD_ARRAY);
+    const $data = this.data;
+    return $data.get(WORDS_MAP)[$data.get(WORD_INDEX)].get(WORD_ARRAY);
   }
 
   getNext() {
-    const wordConfig = getNextWord(this);
-    if (!wordConfig) {
+    const $data = this.data;
+    if ($data.get(WORDS_MAP).size < $data.get(WORD_INDEX) + 1) {
       return false;
     }
-    const $data = this.data;
+    const wordConfig = new Map();
     wordConfig.set(BLACKLIST, $data.get(BLACKLIST));
     wordConfig.set(SEGMENT, $data.get(SEGMENT));
     wordConfig.set(TRAY, $data.get(TRAY));
-    wordConfig.set(WORD_ARRAY, wordConfig.get(WORD_STRING).split(""));
+    wordConfig.set(WORD_INDEX, $data.get(WORD_INDEX) + 1);
+    wordConfig.set(WORDS_MAP, $data.get(WORDS_MAP));
     return new Word(wordConfig);
   }
 
   getString() {
-    return this.data.get(WORD_STRING);
+    const $data = this.data;
+    return $data.get(WORDS_MAP)[$data.get(WORD_INDEX)].get(WORD_STRING);
   }
 
   init() {
-    const wordConfig = getNextWord(this);
-    if (!wordConfig) {
+    const $data = this.data;
+    const words = getWordsForSegment($data.get(BLACKLIST), $data.get(SEGMENT), $data.get(TRAY));
+    if (!words.size) {
       return false;
     }
     const $data = this.data;
-    $data.set(BRANCH, wordConfig.get(BRANCH));
-    $data.set(PARTS, wordConfig.get(PARTS));
-    $data.set(WORD_STRING, wordConfig.get(WORD_STRING));
-    $data.set(WORD_ARRAY, wordConfig.get(WORD_STRING).split(""));
+    $data.set(WORDS_MAP, words);
+    $data.set(WORD_INDEX, 0);
     return this;
-  }
-
-  partMeetsCriteria(part) {
-    const $data = this.data;
-    const counts = $data.get(TRAY).getCountsWith($data.get(SEGMENT).getCounts());
-    while (part.length > 0) {
-      const letter = part[0];
-      let instances = 0;
-      part = part.replaceAll(letter, () => {
-        instances++;
-        return "";
-      });
-      if (!counts.has(letter) || counts.get(letter) < instances) {
-        return false;
-      }
-    }
-    return true;
   }
 }
 

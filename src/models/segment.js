@@ -1,4 +1,4 @@
-// TODO: maps & symbols
+// TODO
 
 import getLetterCounts from "../util/getLetterCounts";
 import getPatterns from "../util/getPatterns";

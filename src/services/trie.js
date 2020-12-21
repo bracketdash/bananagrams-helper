@@ -1,4 +1,4 @@
-import { WORDLIST_SET } from "../util/symbols";
+import { BY_LETTER_COUNT, WORD_SYMBOLS, WORDLIST_SET } from "../util/symbols";
 import decode from "../util/decode";
 import processNode from "../util/processNode";
 import processWords from "../util/processWords";
@@ -23,18 +23,19 @@ export const downloadAndUnPackTrie = () => {
       });
       nodes = nodes.slice(syms.size);
       const wordlistSet = processNode(0, "", nodes, syms, new Set());
+      const { byLetterCount, wordSymbols } = processWords(wordlistSet);
+      data.set(BY_LETTER_COUNT, byLetterCount);
+      data.set(WORD_SYMBOLS, wordSymbols);
       data.set(WORDLIST_SET, wordlistSet);
-      console.log(wordlistSet);
-      // data.set(WORDLIST_DYNAMIC, processWords(wordlistSet));
       resolve();
     });
   });
 };
 
-export const getWordsForSegment = () => {
+export const getWordsForSegment = (blacklist, segment, tray) => {
   // TODO
 };
 
 export const isAWord = (word) => {
-  return this.data.get(WORDLIST_SET).has(word);
+  return data.get(WORDLIST_SET).has(word);
 };

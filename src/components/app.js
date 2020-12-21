@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { BOARD_ARRAY, MESSAGE, READY, TRAY } from "../util/symbols";
 
-import { onUpdate } from "../services/solver";
+import { onUpdate, solve } from "../services/solver";
 
 import Blacklist from "./blacklist";
 import Tray from "./tray";
@@ -23,6 +23,9 @@ export default () => {
     [...update.keys()].forEach((key) => {
       setters.get(key)(update.get(key));
     });
+    if (update.has(READY)) {
+      solve();
+    }
   });
 
   return (
@@ -30,8 +33,8 @@ export default () => {
       <div className="header">
         <h1>Bananagrams Helper</h1>
       </div>
-      <Tray ready={ready} />
-      <Blacklist ready={ready} />
+      <Tray />
+      <Blacklist />
       <div className="boardbox">
         <div className="board">
           {boardArr.map((row, rowIndex) => (

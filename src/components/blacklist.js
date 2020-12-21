@@ -18,7 +18,7 @@ export default (props) => {
         <small>(Comma-separated)</small>
       </div>
       <div>
-        <input type="text" value={blacklistStr} onInput={updateBlacklistStr} disabled={!props.ready} />
+        <input type="text" value={blacklistStr} onInput={updateBlacklistStr} />
       </div>
     </div>
   );

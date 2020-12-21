@@ -10,6 +10,7 @@ const data = new Map();
 downloadAndUnPackTrie().then(() => {
   const updateConfig = new Map();
   updateConfig.set(READY, true);
+  data.set(READY, true);
   data.get(UPDATE_FUNCTION)(updateConfig);
 });
 
@@ -28,6 +29,10 @@ export const solve = (trayStr, blacklistStr) => {
     data.set(TRAY_STRING, blacklistStr);
   } else if (!data.has(TRAY_STRING)) {
     data.set(TRAY_STRING, "");
+  }
+  
+  if (!data.get(TRAY_STRING) || !data.get(READY)) {
+    return;
   }
 
   const solveConfig = new Map();
