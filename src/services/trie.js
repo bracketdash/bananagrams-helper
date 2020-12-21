@@ -119,24 +119,41 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
     .sort()
     .join("");
   if (!comboCache.has(alphaKey)) {
-    // TODO: create comboCache entry (alphaKey, Set({ wordArr, wordStr }, {..}, ..))
     const entry = new Set();
+    let firstLetterDone = false;
     counts.forEach((count, letter) => {
-      // byLetterCount.get(letter).get(count);
+      if (!firstLetterDone) {
+        byLetterCount
+          .get(letter)
+          .get(count)
+          .forEach((wordSymbol) => {
+            entry.add(wordSymbol);
+          });
+        firstLetterDone = true;
+        return;
+      }
+      entry.forEach((wordSymbol) => {
+        // TODO: remove from `entry` any wordSymbols that do NOT exist in byLetterCount.get(letter).get(count)
+      });
     });
-    comboCache.set(alphaKey, entry);
+    const wordMap = new Map();
+    entry.forEach((wordSymbol) => {
+      const { wordArr, wordStr } = wordSymbols.get(wordSymbol);
+      wordMap.set(wordStr, wordArr);
+    });
+    comboCache.set(alphaKey, wordMap);
   }
-  const wordSet = comboCache.get(alphaKey);
-  blacklist.forEach((word) => {
-    if (wordSet.has(word)) {
-      wordSet.delete(word);
+  const wordMap = comboCache.get(alphaKey);
+  blacklist.forEach((wordStr) => {
+    if (wordMap.has(wordStr)) {
+      wordMap.delete(wordStr);
     }
   });
   const words = new Map();
   let wordIndex = 0;
-  wordSet.forEach((word) => {
-    if (segment.allows(word.wordStr)) {
-      words.set(wordIndex, word);
+  wordMap.forEach((wordArr, wordStr) => {
+    if (segment.allows(wordStr)) {
+      words.set(wordIndex, { wordArr, wordStr });
       wordIndex++;
     }
   });
