@@ -100,9 +100,9 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
   //   comboCache.get( alphabetized letters ,  set of word objects  )
   // else {
   //   get the words
-  //   remove words that are on the blacklist
   //   add word objects to the comboCache
   // }
+  // remove words that are on the blacklist
   // test all the words against the segment pattern
 };
 
