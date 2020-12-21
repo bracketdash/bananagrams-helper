@@ -1,12 +1,9 @@
-// TODO
-
-import getLetterCounts from "../util/getLetterCounts";
-import getPatterns from "../util/getPatterns";
+import getSegments from "../util/getSegments";
 
 class Segment {
-  constructor(boardArr) {
+  constructor(boardArr, segments, index) {
     this.boardArr = boardArr;
-    this.index = index;
+    this.index = index || 0;
     this.segments = segments;
   }
 
@@ -23,16 +20,15 @@ class Segment {
   }
 
   getNext() {
-    const { index, segments, state } = this;
+    const { boardArr, index, segments } = this;
     if (index === segments.length - 1) {
       return false;
     }
-    return new Segment({ index: index + 1, segments, state });
+    return new Segment(boardArr, segments, index + 1);
   }
 
   init() {
-    this.index = 0;
-    const boardArr = this.state.getBoard().getArray();
+    const boardArr = this.boardArr;
     if (boardArr.length === 1 && boardArr[0].length === 1) {
       this.segments = [
         {
@@ -57,50 +53,20 @@ class Segment {
       });
       return cols.join("");
     });
-    // TODO: abstract out to ../util/produceSegments (add any needed args)
-    const produceSegments = (str, index, down) => {
-      const trimmedLeft = str.trimLeft();
-      const trimmed = trimmedLeft.trimRight();
-      const inLeft = str.length - trimmedLeft.length;
-      const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
-      const perps = new Map();
-      [...Array(str.length).keys()].forEach((perpIndex) => {
-        const wholePerp = down ? rows[perpIndex] : columns[perpIndex];
-        const left = wholePerp.slice(0, index).split(/\s+/).pop();
-        const right = wholePerp.slice(index + 1, 0).split(/\s+/)[0];
-        if (!left.length && !right.length) {
-          return;
-        }
-        perps.set(perpIndex, { left, right });
-      });
-      const startingSegment = { counts, down, perps };
-      getPatterns(trimmed).forEach(({ tilesLeftTrim, pattern }) => {
-        const start = tilesLeftTrim + inLeft;
-        startingSegment.pattern = pattern;
-        if (down) {
-          segments.push(Object.assign({ col: index, row: start }, startingSegment));
-        } else {
-          segments.push(Object.assign({ col: start, row: index }, startingSegment));
-        }
-      });
-    };
     rows.forEach((rowStr, rowIndex) => {
-      produceSegments(rowStr, rowIndex, false);
+      getSegments(rowStr, rowIndex, false, segments, columns);
     });
     columns.forEach((colStr, colIndex) => {
-      produceSegments(colStr, colIndex, true);
+      getSegments(colStr, colIndex, true, segments, rows);
     });
     if (!segments.length) {
       return false;
     }
     this.segments = segments;
+    return this;
   }
 }
 
-export default ({ state }) => {
-  const segment = new Segment({ state });
-  if (!segment.init()) {
-    return false;
-  }
-  return segment;
+export default (boardArr) => {
+  return new Segment(boardArr).init();
 };

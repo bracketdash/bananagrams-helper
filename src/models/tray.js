@@ -1,18 +1,13 @@
-// TODO
-
-import { LETTER_COUNTS, TRAY_STRING } from "../util/symbols";
 import getLetterCounts from "../util/getLetterCounts";
 
 class Tray {
-  constructor(str) {
-    const $data = new Map();
-    $data.set(TRAY_STRING, str);
-    $data.set(LETTER_COUNTS, getLetterCounts(str));
-    this.data = $data;
+  constructor(trayStr) {
+    this.trayStr = trayStr;
+    this.letterCounts = getLetterCounts(str);
   }
-  
+
   getCountsWith(segmentCounts) {
-    const $counts = this.data.gets(LETTER_COUNTS);
+    const $counts = this.letterCounts;
     const counts = new Map();
     $counts.forEach((count, letter) => {
       counts.set(letter, count);
@@ -22,21 +17,21 @@ class Tray {
     });
     return counts;
   }
-  
+
   getNext(tilesToRemove) {
-    let newTrayStr = this.data.set(TRAY_STRING);
+    let newTrayStr = this.trayStr;
     tilesToRemove.forEach((tileToRemove) => {
       newTrayStr = newTrayStr.replace(tileToRemove, "");
     });
     return new Tray(newTrayStr);
   }
-  
+
   getString() {
-    return this.data.set(TRAY_STRING);
+    return this.trayStr;
   }
-  
+
   isEmpty() {
-    return this.data.set(TRAY_STRING) === "";
+    return this.trayStr === "";
   }
 }
 

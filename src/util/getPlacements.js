@@ -1,15 +1,11 @@
-// TODO
-
 import { isAWord } from "../services/trie";
 
 export default (segment, word) => {
   const placements = [];
 
   const segmentData = segment.getData();
-  const down = segmentData.get(IS_DOWN);
-  const perps = segmentData.get(PERPINDICULARS);
-  let col = segmentData.get(COLUMN_INDEX);
-  let row = segmentData.get(ROW_INDEX);
+  const { down, pattern, perps } = segmentData;
+  let { col, row } = segmentData;
 
   const wordArr = word.getArray();
   const wordStr = word.getString();
@@ -20,7 +16,7 @@ export default (segment, word) => {
 
   while (index > -1 && index < wordStr.length - 1) {
     lastIndex = index;
-    index = wordStr.slice(index).search(segmentData.get(PATTERN));
+    index = wordStr.slice(index).search(pattern);
     if (index === -1) {
       continue;
     }
@@ -53,13 +49,7 @@ export default (segment, word) => {
       });
     });
 
-    const placement = new Map();
-    placement.set(COLUMN_INDEX, col);
-    placement.set(IS_DOWN, down);
-    placement.set(ROW_INDEX, row);
-    placement.set(TILES_ARRAY, tiles.split(""));
-    placement.set(WORD_ARRAY, wordArr);
-    placements.push(placement);
+    placements.push({ col, down, row, tilesArr: tiles.split(""), wordArr });
 
     index = lastIndex + (index || 1);
   }
