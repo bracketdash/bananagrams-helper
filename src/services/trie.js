@@ -59,14 +59,10 @@ const processWord = (wordStr) => {
     if (!byLetterCount.has(letter)) {
       byLetterCount.set(letter, new Map());
     }
-    const instanceMap = byLetterCount.get(letter);
-    [...Array(instances).keys()].forEach((index) => {
-      indexPlusOne = index + 1;
-      if (!instanceMap.has(indexPlusOne)) {
-        instanceMap.set(indexPlusOne, new Set());
-      }
-      instanceMap.get(indexPlusOne).add(wordSymbol);
-    });
+    if (!byLetterCount.get(letter).has(instances)) {
+      byLetterCount.get(letter).set(instances, new Set());
+    }
+    byLetterCount.get(letter).get(instances).add(wordSymbol);
   });
   wordlistSet.add(wordStr);
   wordSymbols.set(wordSymbol, { wordStr, wordArr });
@@ -88,6 +84,8 @@ export const downloadAndUnpackTrie = () => {
       numSyms = syms.size;
       nodes = nodes.slice(numSyms);
       processNode(0, "");
+      // TODO: byLetterCount should represent all words that can be made with up to that many of that letter
+      // currently we'd have to get each instances set and add them together in getWordsForSegment()
       resolve();
     });
   });
@@ -101,6 +99,11 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
   }, "").split("").sort().join("");
   if (!comboCache.has(alphaKey)) {
     // TODO: create comboCache entry (alphaKey, Set({ wordArr, wordStr }, {..}, ..))
+    const entry = new Set();
+    counts.forEach((count, letter) => {
+      // byLetterCount.get(letter).get(count);
+    });
+    comboCache.set(alphaKey, entry);
   }
   const wordSet = comboCache.get(alphaKey);
   blacklist.forEach((word) => {
