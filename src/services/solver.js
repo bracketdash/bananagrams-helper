@@ -1,13 +1,13 @@
 import { BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
-import { downloadAndUnPackTrie } from "./trie";
+import { downloadAndUnpackTrie } from "./trie";
 
 import createSolve from "../models/solve";
 import createTray from "../models/tray";
 
 const data = new Map();
 
-downloadAndUnPackTrie().then(() => {
+downloadAndUnpackTrie().then(() => {
   const updateConfig = new Map();
   updateConfig.set(READY, true);
   data.set(READY, true);
