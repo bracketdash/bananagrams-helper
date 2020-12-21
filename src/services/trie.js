@@ -97,13 +97,14 @@ export const downloadAndUnpackTrie = () => {
 export const getWordsForSegment = (blacklist, segment, tray) => {
   // TODO
   // if (!comboCache.has(alphabetized letters of tray + segment))
-  //   comboCache.get( alphabetized letters ,  set of word objects  )
+  //   comboCache.get( alphabetized letters ,  map of (wordStr, word objects)  )
   // else {
   //   get the words
   //   add word objects to the comboCache
   // }
   // remove words that are on the blacklist
   // test all the words against the segment pattern
+  // return a map of words indexed like an array
 };
 
 export const isAWord = (word) => {
