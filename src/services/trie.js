@@ -94,13 +94,16 @@ export const downloadAndUnpackTrie = () => {
 };
 
 export const getWordsForSegment = (blacklist, segment, tray) => {
+  const counts = tray.getCountsWith(segment.getCounts());
+  const alphaKey = [...counts].reduce((str, [letter, count]) => {
+    str += letter.repeat(count);
+    return str;
+  }, "").split("").sort().join("");
+  if (!comboCache.has(alphaKey)) {
+    // TODO: create comboCache entry (alphaKey, Set({ wordArr, wordStr }, {..}, ..))
+  }
+  const wordSet = comboCache.get(alphaKey);
   // TODO
-  // if (!comboCache.has(alphabetized letters of tray + segment))
-  //   comboCache.get( alphabetized letters ,  map of (wordStr, word objects)  )
-  // else {
-  //   get the words
-  //   add word objects to the comboCache
-  // }
   // remove words that are on the blacklist
   // test all the words against the segment pattern
   // return a map of words indexed like an array (0, { wordArr, wordStr }), (1, {...}), ...
