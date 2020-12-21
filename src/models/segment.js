@@ -7,10 +7,6 @@ class Segment {
     this.segments = segments;
   }
 
-  allows(word) {
-    return this.segments[this.index].pattern.test(word);
-  }
-
   getCounts() {
     return this.segments[this.index].counts;
   }
@@ -27,6 +23,10 @@ class Segment {
     return new Segment(boardArr, segments, index + 1);
   }
 
+  getPattern() {
+    return this.segments[this.index].pattern;
+  }
+
   init() {
     const boardArr = this.boardArr;
     if (boardArr.length === 1 && boardArr[0].length === 1) {
@@ -40,7 +40,7 @@ class Segment {
           row: 0,
         },
       ];
-      return true;
+      return this;
     }
     const segments = [];
     const columns = [];

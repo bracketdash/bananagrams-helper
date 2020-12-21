@@ -3,7 +3,7 @@ import getLetterCounts from "../util/getLetterCounts";
 class Tray {
   constructor(trayStr) {
     this.trayStr = trayStr;
-    this.letterCounts = getLetterCounts(str);
+    this.letterCounts = getLetterCounts(trayStr);
   }
 
   getCountsWith(segmentCounts) {

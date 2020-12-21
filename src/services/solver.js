@@ -1,4 +1,4 @@
-import { BLACKLIST_STRING, CURRENT_SOLVE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
+import { BLACKLIST_STRING, CURRENT_SOLVE, MESSAGE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
 import { downloadAndUnpackWords } from "./words";
 
@@ -9,6 +9,7 @@ const data = new Map();
 
 downloadAndUnpackWords().then(() => {
   const updateConfig = new Map();
+  updateConfig.set(MESSAGE, "Ready!");
   updateConfig.set(READY, true);
   data.set(READY, true);
   data.get(UPDATE_FUNCTION)(updateConfig);
@@ -26,11 +27,11 @@ export const solve = async (trayStr, blacklistStr) => {
   }
 
   if (trayStr) {
-    data.set(TRAY, blacklistStr);
+    data.set(TRAY, trayStr);
   } else if (!data.has(TRAY)) {
     data.set(TRAY, "");
   }
-
+  
   if (!data.get(TRAY) || !data.get(READY)) {
     return;
   }

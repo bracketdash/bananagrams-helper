@@ -16,13 +16,18 @@ export const downloadAndUnpackWords = () => {
 
 export const getWordsForSegment = (blacklist, segment, tray) => {
   return new Promise((resolve) => {
+    const counts = tray.getCountsWith(segment.getCounts());
+    if (/* TODO: sum of tray and segment letters is less than 2 */) {
+      resolve(new Map());
+      return;
+    }
     trieWorker.onmessage = ({ data }) => {
       resolve(data);
     };
     trieWorker.postMessage({
       action: "getWordsForSegment",
       blacklist,
-      counts: tray.getCountsWith(segment.getCounts()),
+      counts,
       pattern: segment.getPattern(),
     });
   });
