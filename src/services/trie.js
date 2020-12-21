@@ -1,5 +1,4 @@
 import decode from "../util/decode";
-import getLetterCounts from "../util/getLetterCounts";
 
 import wordsTxt from "../assets/words.txt";
 
@@ -9,6 +8,7 @@ const wordlistSet = new Set();
 const wordSymbols = new Map();
 
 let i;
+let indexPlusOne;
 let matches;
 let matchesLength;
 let newSofar;
@@ -22,7 +22,6 @@ let ref;
 const processNode = (index, sofar) => {
   node = nodes[index];
   if (node[0] === "!") {
-    wordlistSet.add(sofar);
     processWord(sofar);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
@@ -39,7 +38,6 @@ const processNode = (index, sofar) => {
     newSofar = sofar + part;
     ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      wordlistSet.add(newSofar);
       processWord(newSofar);
       i += 2;
       continue;
@@ -50,8 +48,12 @@ const processNode = (index, sofar) => {
   }
 };
 
-const processWord = (word) => {
-  const letterCounts = getLetterCounts(word);
+const processWord = (wordStr) => {
+  const wordArr = wordStr.split("");
+  const letterCounts = wordArr.reduce((counts, letter) => {
+    counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+    return counts;
+  }, new Map());
   const wordSymbol = Symbol();
   letterCounts.forEach((instances, letter) => {
     if (!byLetterCount.has(letter)) {
@@ -59,14 +61,15 @@ const processWord = (word) => {
     }
     const instanceMap = byLetterCount.get(letter);
     [...Array(instances).keys()].forEach((index) => {
-      const indexPlusOne = index + 1;
+      indexPlusOne = index + 1;
       if (!instanceMap.has(indexPlusOne)) {
         instanceMap.set(indexPlusOne, new Set());
       }
       instanceMap.get(indexPlusOne).add(wordSymbol);
     });
   });
-  wordSymbols.set(wordSymbol, { letterCounts, wordStr: word, wordArr: word.split("") });
+  wordlistSet.add(wordStr);
+  wordSymbols.set(wordSymbol, { letterCounts, wordStr, wordArr });
 };
 
 export const downloadAndUnpackTrie = () => {
