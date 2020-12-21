@@ -3,6 +3,7 @@ import decode from "../util/decode";
 import wordsTxt from "../assets/words.txt";
 
 const byLetterCount = new Map();
+const comboCache = new Map();
 const syms = new Map();
 const wordlistSet = new Set();
 const wordSymbols = new Map();
@@ -95,6 +96,14 @@ export const downloadAndUnpackTrie = () => {
 
 export const getWordsForSegment = (blacklist, segment, tray) => {
   // TODO
+  // if (!comboCache.has(alphabetized letters of tray + segment))
+  //   comboCache.get( alphabetized letters ,  set of word objects  )
+  // else {
+  //   get the words
+  //   remove words that are on the blacklist
+  //   add word objects to the comboCache
+  // }
+  // test all the words against the segment pattern
 };
 
 export const isAWord = (word) => {
