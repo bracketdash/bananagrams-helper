@@ -9,12 +9,13 @@ export default (segment, word) => {
 
   const wordArr = word.getArray();
   const wordStr = word.getString();
+  const maxIndex = wordStr.length - 1;
 
   let index = 0;
   let lastIndex;
   let start;
 
-  while (index > -1 && index < wordStr.length - 1) {
+  while (index > -1 && index < maxIndex) {
     lastIndex = index;
     index = wordStr.slice(index).search(pattern);
     if (index === -1) {
