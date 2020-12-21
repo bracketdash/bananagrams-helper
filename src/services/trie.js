@@ -122,18 +122,18 @@ export const getWordsForSegment = (blacklist, segment, tray) => {
     const entry = new Set();
     let firstLetterDone = false;
     counts.forEach((count, letter) => {
+      const wordsByLetterCount = byLetterCount.get(letter).get(count);
       if (!firstLetterDone) {
-        byLetterCount
-          .get(letter)
-          .get(count)
-          .forEach((wordSymbol) => {
-            entry.add(wordSymbol);
-          });
+        wordsByLetterCount.forEach((wordSymbol) => {
+          entry.add(wordSymbol);
+        });
         firstLetterDone = true;
         return;
       }
       entry.forEach((wordSymbol) => {
-        // TODO: remove from `entry` any wordSymbols that do NOT exist in byLetterCount.get(letter).get(count)
+        if (!wordsByLetterCount.has(wordSymbol)) {
+          entry.delete(wordSymbol);
+        }
       });
     });
     const wordMap = new Map();
