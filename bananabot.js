@@ -55,6 +55,9 @@ fetch("/words.txt").then(async (response) => {
   postMessage({ message: "Post-processing words by letter count..." });
   console.time("Post-processing words by letter count");
   // TODO: each byLetterCount set should be words that CAN'T be built with fewer than `instances` of `letter`
+  // at this point in the code, byLetterCount.get(N) is words that have exactly N `instances` of `letter`
+  /*
+  OLD CODE BELOW
   byLetterCount.forEach((instanceMap) => {
     const sumSet = new Set();
     [...instanceMap.keys()].sort().forEach((key) => {
@@ -69,6 +72,7 @@ fetch("/words.txt").then(async (response) => {
       });
     });
   });
+  */
   console.timeEnd("Post-processing words by letter count");
   postMessage({ ready: true });
 });
@@ -134,7 +138,6 @@ const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
   const wordSymbol = Symbol(wordStr);
-  // TODO: each byLetterCount set should be words that CAN'T be built with fewer than `instances` of `letter`
   wordArr
     .reduce((counts, letter) => {
       counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
