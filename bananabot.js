@@ -128,7 +128,7 @@ const processWord = (wordStr) => {
       byLetter.get(instances).add(wordSymbol);
     });
   wordlistSet.add(wordStr);
-  wordSymbols.set(wordSymbol, { wordStr, wordArr });
+  wordSymbols.set(wordSymbol, { wordArr, wordLength: wordStr.length, wordStr });
 };
 
 /* * * * * *
@@ -321,25 +321,25 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
     // TODO:
-    // clone the word length set as a starting point?
+    // clone the word length set as a starting point:
     // create word length sets during startup
     // each word length set should represent all words that are UP TO that length
     counts.forEach((count, letter) => {
       const wordsByLetterCount = byLetterCount.get(letter).get(count);
-      // TODO: make sure this is the right/best logic...
-      // maybe dynamically figure out which starting point would be best?
-      // maybe change the sets in byLetterCount or byLength to help with whatever strategy we go with?
+      // TODO:
+      // build the byLetterCount sets differently to speed things up:
+      // instead, each set would be words that CAN'T be built with fewer than `instances` of the letter
+      // that way, the loop below doesn't even have to have the if statement
       entry.forEach((wordSymbol) => {
         if (!wordsByLetterCount.has(wordSymbol)) {
           entry.delete(wordSymbol);
         }
       });
     });
-    // TODO: order words by length so the longest words are tried first
     const wordMap = new Map();
     entry.forEach((wordSymbol) => {
-      const { wordArr, wordStr } = wordSymbols.get(wordSymbol);
-      wordMap.set(wordStr, wordArr);
+      const wordData = wordSymbols.get(wordSymbol);
+      wordMap.set(wordData.wordStr, wordData);
     });
     comboCache.set(alphaKey, wordMap);
   }
@@ -349,15 +349,13 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
       wordMap.delete(wordStr);
     }
   });
-  const words = new Map();
-  let wordIndex = 0;
-  wordMap.forEach((wordArr, wordStr) => {
+  const words = [];
+  wordMap.forEach((wordData, wordStr) => {
     if (pattern.test(wordStr)) {
-      words.set(wordIndex, { wordArr, wordStr });
-      wordIndex++;
+      words.push(wordData);
     }
   });
-  return words;
+  return words.sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
 };
 
 // SOLVER CLASSES
@@ -702,7 +700,7 @@ class Word {
   }
 
   getArray() {
-    return this.words.get(this.index).wordArr;
+    return this.words[this.index].wordArr;
   }
 
   getNext() {
@@ -715,13 +713,13 @@ class Word {
   }
 
   getString() {
-    return this.words.get(this.index).wordStr;
+    return this.words[this.index].wordStr;
   }
 
   init() {
     const { blacklist, segment, tray } = this;
     const words = getWordsForSegment(blacklist, tray.getCountsWith(segment.getCounts()), segment.getPattern());
-    if (!words.size) {
+    if (!words.length) {
       return false;
     }
     this.index = 0;
