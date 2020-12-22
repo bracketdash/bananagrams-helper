@@ -9,14 +9,6 @@ const wordSymbols = new Map();
  * INITIALIZATION  *
  * * * * * * * * * */
 
-// TODO:
-// build the byLetterCount sets differently to speed things up:
-// instead, each set would be words that CAN'T be built with fewer than `instances` of the letter
-
-// TODO:
-// create word length sets during startup
-// each word length set should represent all words that are UP TO that length
-
 const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
 const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
 const syms = new Map();
@@ -32,6 +24,7 @@ let ref;
 
 fetch("/words.txt").then(async (response) => {
   postMessage({ message: "Unpacking word list..." });
+  console.time("Unpacking word list");
   nodes = (await response.text()).split(";");
   nodes.some((node) => {
     const symParts = pattern.exec(node);
@@ -44,7 +37,24 @@ fetch("/words.txt").then(async (response) => {
   numSyms = syms.size;
   nodes = nodes.slice(numSyms);
   processNode(0, "");
-  postMessage({ message: "Building caches..." });
+  console.timeEnd("Unpacking word list");
+  postMessage({ message: "Building initial caches..." });
+  console.time("Building initial caches");
+  wordlistSet.forEach(processWord);
+  console.timeEnd("Building initial caches");
+  postMessage({ message: "Post-processing words by length..." });
+  console.time("Post-processing words by length");
+  let wordsByLength = new Set();
+  [...byWordLength.keys()].sort().forEach((length) => {
+    const wordSymbols = byWordLength.get(length);
+    const justThisLength = new Set(wordSymbols);
+    byWordLength.set(length, new Set([...wordSymbols, ...wordsByLength]));
+    wordsByLength = new Set([...wordsByLength, ...justThisLength]);
+  });
+  console.timeEnd("Post-processing words by length");
+  postMessage({ message: "Post-processing words by letter count..." });
+  console.time("Post-processing words by letter count");
+  // TODO: each byLetterCount set should be words that CAN'T be built with fewer than `instances` of `letter`
   byLetterCount.forEach((instanceMap) => {
     const sumSet = new Set();
     [...instanceMap.keys()].sort().forEach((key) => {
@@ -59,6 +69,7 @@ fetch("/words.txt").then(async (response) => {
       });
     });
   });
+  console.timeEnd("Post-processing words by letter count");
   postMessage({ ready: true });
 });
 
@@ -95,6 +106,7 @@ const processNode = (index, sofar) => {
   node = nodes[index];
   let matches;
   if (node[0] === "!") {
+    wordlistSet.add(sofar);
     processWord(sofar);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
@@ -109,6 +121,7 @@ const processNode = (index, sofar) => {
     newSofar = sofar + part;
     ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
+      wordlistSet.add(newSofar);
       processWord(newSofar);
       continue;
     }
@@ -119,7 +132,9 @@ const processNode = (index, sofar) => {
 
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
+  const wordLength = wordStr.length;
   const wordSymbol = Symbol(wordStr);
+  // TODO: each byLetterCount set should be words that CAN'T be built with fewer than `instances` of `letter`
   wordArr
     .reduce((counts, letter) => {
       counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
@@ -135,8 +150,11 @@ const processWord = (wordStr) => {
       }
       byLetter.get(instances).add(wordSymbol);
     });
-  wordlistSet.add(wordStr);
-  wordSymbols.set(wordSymbol, { wordArr, wordLength: wordStr.length, wordStr });
+  if (!byWordLength.has(wordLength)) {
+    byWordLength.set(wordLength, new Set());
+  }
+  byWordLength.get(wordLength).add(wordSymbol);
+  wordSymbols.set(wordSymbol, { wordArr, wordLength, wordStr });
 };
 
 /* * * * * *
