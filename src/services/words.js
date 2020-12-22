@@ -17,7 +17,7 @@ export const downloadAndUnpackWords = () => {
 export const getWordsForSegment = (blacklist, segment, tray) => {
   return new Promise((resolve) => {
     const counts = tray.getCountsWith(segment.getCounts());
-    if (/* TODO: sum of tray and segment letters is less than 2 */) {
+    if (counts.size === 1 && [...counts.values()][0] < 2) {
       resolve(new Map());
       return;
     }
