@@ -358,13 +358,10 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     });
     console.log(`entry.size (after): ${entry.size}`);
     
-    
     // TODO:
-    // at this point in the code, we have...
-    //      - gotten words up to length
-    //      - removed words that need more instances of letters than are in the tray
     // we still need to remove words that contain letters that aren't in alphaKey at all
-    
+    // maybe we include a 0 (zero) for each letter in byLetterCount that has all the words that don't have any of that letter?
+    // that way, we can go through the whole alphabet above with the counts (many will be zero for smaller trays)
     
     const wordMap = new Map();
     entry.forEach((wordSymbol) => {
