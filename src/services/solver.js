@@ -14,6 +14,7 @@ import createTray from "../models/tray";
 
 const data = new Map();
 
+// TODO: maybe move this into app.js so we don't have to have a "ready" update at all
 downloadAndUnpackWords().then(() => {
   const updateConfig = new Map();
   updateConfig.set(MESSAGE, "Ready!");
