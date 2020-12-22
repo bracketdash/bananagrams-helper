@@ -1,44 +1,169 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf8" />
-        <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
-        <title>Bananagrams Solver</title>
-        <link rel="stylesheet" href="styles.css" />
-    </head>
-    <body>
-        <div id="app">
-            <div class="header">
-                <h1>Bananagrams Solver</h1>
-            </div>
-            <div class="letterbox">
-                <input type="text" placeholder="yourtileshere" v-model="letters" @keyup="solve" />
-            </div>
-            <div class="controls">
-                <div>
-                    <label>Word Blacklist</label>
-                    <small>(Comma-separated)</small>
-                </div>
-                <div>
-                    <input type="text" v-model="blacklist" @keyup="solve" />
-                </div>
-            </div>
-            <div class="boardbox">
-                <div class="board">
-                    <div class="row" v-for="row in board">
-                        <div class="cell" v-for="cell in row" :class="cell == ' ' ? 'empty' : ''">
-                            {{cell}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tray">{{tray}}</div>
-            <div class="message">{{message}}</div>
-        </div>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-        <script src="https://cdn.jsdelivr.net/npm/lodash"></script>
-        <script src="trie.js"></script>
-        <script src="solver.js"></script>
-        <script src="app.js"></script>
-    </body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bananabot 2</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+    <script>
+      const bananabot = new Worker("/bananabot.js");
+
+      let blacklistStr = "";
+      let ready = false;
+      let trayStr = "";
+
+      const solve = (tray, blacklist) => {
+        if (blacklist) {
+          blacklistStr = blacklist;
+        }
+        if (tray) {
+          trayStr = tray;
+        }
+        if (!trayStr || !ready) {
+          return;
+        }
+        bananabot.postMessage({ blacklistStr, trayStr });
+      };
+
+      const Tray = () => {
+        const [trayStr, setTrayStr] = React.useState("");
+
+        const updateTrayStr = ({ target }) => {
+          const newTrayStr = target.value.replace(/[^A-Z]/gi, "").toLowerCase();
+          setTrayStr(newTrayStr);
+          solve(newTrayStr);
+        };
+
+        return React.createElement(
+          "div",
+          {
+            className: "letterbox",
+          },
+          React.createElement("input", {
+            autofocus: "autofocus",
+            type: "text",
+            value: trayStr,
+            onInput: updateTrayStr,
+          })
+        );
+      };
+
+      const Blacklist = () => {
+        const [blacklistStr, setBlacklistStr] = React.useState("");
+
+        const updateBlacklistStr = ({ target }) => {
+          const newBlacklistStr = target.value.replace(/[^A-Z,]/gi, "").toLowerCase();
+          setBlacklistStr(newBlacklistStr);
+          solve(false, newBlacklistStr);
+        };
+
+        return React.createElement(
+          "div",
+          {
+            className: "controls",
+          },
+          React.createElement("div", null, React.createElement("label", null, "Word Blacklist"), React.createElement("small", null, "(Comma-separated)")),
+          React.createElement(
+            "div",
+            null,
+            React.createElement("input", {
+              type: "text",
+              value: blacklistStr,
+              onInput: updateBlacklistStr,
+            })
+          )
+        );
+      };
+
+      const App = () => {
+        const [boardArr, setBoardArr] = React.useState([[" "]]);
+        const [message, setMessage] = React.useState("Loading...");
+        const [showBigMsg, setShowBigMsg] = React.useState(true);
+        const [remainingTray, setRemainingTray] = React.useState("");
+
+        bananabot.onmessage = ({ data }) => {
+          if (data.ready) {
+            ready = true;
+            setMessage("Ready!");
+            solve();
+            return;
+          }
+          if (ready && showBigMsg) {
+            setShowBigMsg(false);
+          }
+          const { boardArr, message, remainingTray } = data;
+          if (boardArr) {
+            setBoardArr(boardArr);
+          }
+          if (message) {
+            setMessage(message);
+          }
+          if (remainingTray) {
+            setRemainingTray(remainingTray);
+          }
+        };
+
+        return React.createElement(
+          "div",
+          {
+            className: showBigMsg ? "show-big-message" : "",
+          },
+          React.createElement(Tray, null),
+          React.createElement(Blacklist, null),
+          React.createElement(
+            "div",
+            {
+              className: "boardbox",
+            },
+            React.createElement(
+              "div",
+              {
+                className: "board",
+              },
+              boardArr.map(function (row, rowIndex) {
+                return React.createElement(
+                  "div",
+                  {
+                    key: rowIndex,
+                    className: "row",
+                  },
+                  row.map(function (cell, cellIndex) {
+                    return React.createElement(
+                      "div",
+                      {
+                        key: cellIndex,
+                        className: cell === " " ? "cell empty" : "cell",
+                      },
+                      cell
+                    );
+                  })
+                );
+              })
+            )
+          ),
+          React.createElement(
+            "div",
+            {
+              className: "tray",
+            },
+            remainingTray
+          ),
+          React.createElement(
+            "div",
+            {
+              className: "message",
+            },
+            message
+          )
+        );
+      };
+
+      ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
+    </script>
+  </body>
 </html>
