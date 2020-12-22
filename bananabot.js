@@ -9,6 +9,14 @@ const wordSymbols = new Map();
  * INITIALIZATION  *
  * * * * * * * * * */
 
+// TODO:
+// build the byLetterCount sets differently to speed things up:
+// instead, each set would be words that CAN'T be built with fewer than `instances` of the letter
+
+// TODO:
+// create word length sets during startup
+// each word length set should represent all words that are UP TO that length
+
 const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
 const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
 const syms = new Map();
@@ -320,20 +328,13 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     .join("");
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
-    // TODO:
-    // clone the word length set as a starting point:
-    // create word length sets during startup
-    // each word length set should represent all words that are UP TO that length
+    byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
+      entry.add(wordSymbol);
+    });
     counts.forEach((count, letter) => {
       const wordsByLetterCount = byLetterCount.get(letter).get(count);
-      // TODO:
-      // build the byLetterCount sets differently to speed things up:
-      // instead, each set would be words that CAN'T be built with fewer than `instances` of the letter
-      // that way, the loop below doesn't even have to have the if statement
-      entry.forEach((wordSymbol) => {
-        if (!wordsByLetterCount.has(wordSymbol)) {
-          entry.delete(wordSymbol);
-        }
+      wordsByLetterCount.forEach((wordSymbol) => {
+        entry.delete(wordSymbol);
       });
     });
     const wordMap = new Map();
