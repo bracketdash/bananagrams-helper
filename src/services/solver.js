@@ -1,12 +1,14 @@
-import { BLACKLIST_STRING, CURRENT_SOLVE, MESSAGE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
+// TODO: (improvements for after testing as-is)
+// get rid of utils/symbols.js and convert data here to just use regular consts or lets
+// see if it's feasible to move from solve.js and down into modules/trie.js (and rename it bananabot.js)
+// then we would just set the current solve ID here and pass it in the pushMessage with the blacklistStr and trayStr
+// move the conversion of the blacklist and tray into the worker file 
+// use onmessage as the update listener
+// when the user requests a new solve, send the currently running solve the signal to stop execution
+// we can use pushMessage and onmessage directly in app.js and get rid of this file
+// convert word.js to use the functions directly and synchronously again instead of talking with the worker (since it'll be in the worker too now)
 
-// TODO: get rid of utils/symbols.js and convert data here to just use regular consts or lets
-// TODO: see if it's feasible to move from solve.js and down into modules/trie.js (and rename it bananabot.js)
-// --> then we would just set the current solve ID here and pass it in the pushMessage with the blacklistStr and trayStr
-// --> move the conversion of the blacklist and tray into the worker file 
-// --> use onmessage as the update listener
-// --> when the user requests a new solve, send the currently running solve the signal to stop execution
-// --> bonus: if we do this, we can use onmessage directly in app.js to skip these update layers
+import { BLACKLIST_STRING, CURRENT_SOLVE, MESSAGE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
 import { downloadAndUnpackWords } from "./words";
 
@@ -15,7 +17,6 @@ import createTray from "../models/tray";
 
 const data = new Map();
 
-// TODO: maybe move this into app.js so we don't have to have a "ready" update at all
 downloadAndUnpackWords().then(() => {
   const updateConfig = new Map();
   updateConfig.set(MESSAGE, "Ready!");
