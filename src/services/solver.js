@@ -1,7 +1,7 @@
 import { BLACKLIST_STRING, CURRENT_SOLVE, MESSAGE, READY, TRAY, UPDATE_FUNCTION } from "../util/symbols";
 
 // TODO: get rid of utils/symbols.js and convert data here to just use regular consts or lets
-// TODO: see if it's feasible to convert from solve.js down into another Worker()
+// TODO: see if it's feasible to move from solve.js and down into modules/trie.js (and rename it bananabot.js)
 // --> then we would just set the current solve ID here and pass it in the pushMessage with the blacklistStr and trayStr
 // --> move the conversion of the blacklist and tray into the worker file 
 // --> use onmessage as the update listener
