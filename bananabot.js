@@ -68,7 +68,7 @@ fetch("/words.txt").then(async (response) => {
       });
   });
   console.timeEnd("Preprocessing words by letter count");
-
+  
   postMessage({ ready: true });
 });
 
@@ -342,6 +342,12 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     .split("")
     .sort()
     .join("");
+  let alphaKeyLength = alphaKey.length;
+  if (alphaKeyLength === 26) {
+    alphaKeyLength = 25;
+  } else if (alphaKeyLength > 28) {
+    alphaKeyLength = 28;
+  }
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
     byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
@@ -354,12 +360,6 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
         }
       });
     });
-    
-    // TODO:
-    // we still need to remove words that contain letters that aren't in alphaKey at all
-    // maybe we include a 0 (zero) for each letter in byLetterCount that has all the words that don't have any of that letter?
-    // that way, we can go through the whole alphabet above with the counts (many will be zero for smaller trays)
-    
     const wordMap = new Map();
     entry.forEach((wordSymbol) => {
       const wordData = wordSymbols.get(wordSymbol);
@@ -370,6 +370,12 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
   const wordMap = comboCache.get(alphaKey);
   blacklist.forEach((wordStr) => {
     if (wordMap.has(wordStr)) {
+      wordMap.delete(wordStr);
+    }
+  });
+  const removerPattern = new RegExp(`[^${[...counts.keys()].join("")}]`);
+  [...wordMap.keys()].forEach((wordStr) => {
+    if (removerPattern.test(wordStr)) {
       wordMap.delete(wordStr);
     }
   });
@@ -655,7 +661,11 @@ class State {
     if (!this.parent) {
       return false;
     }
-    const placement = this.parent.getPlacement().getNext();
+    const currPlacement = this.parent.getPlacement();
+    if (!currPlacement) {
+      return false;
+    }
+    const placement = currPlacement.getNext();
     if (!placement) {
       return false;
     }
@@ -742,6 +752,13 @@ class Word {
 
   init() {
     const { blacklist, segment, tray } = this;
+    
+    // TODO: FIX
+    console.log("segment");
+    console.log(segment);
+    console.log("segment.getPattern()");
+    console.log(segment.getPattern()); // this is undefined even though we have a segment
+    
     const words = getWordsForSegment(blacklist, tray.getCountsWith(segment.getCounts()), segment.getPattern());
     if (!words.length) {
       return false;
