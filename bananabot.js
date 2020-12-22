@@ -347,16 +347,13 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
       entry.add(wordSymbol);
     });
-    console.log(`entry.size (before): ${entry.size}`);
     counts.forEach((count, letter) => {
       byLetterCount.get(letter).get(count).forEach((wordSymbol) => {
         if (entry.has(wordSymbol)) {
-          console.log("deleting:", wordSymbol);
           entry.delete(wordSymbol);
         }
       });
     });
-    console.log(`entry.size (after): ${entry.size}`);
     
     // TODO:
     // we still need to remove words that contain letters that aren't in alphaKey at all
@@ -382,7 +379,6 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
       words.push(wordData);
     }
   });
-  console.log(`words.length: ${words.length}`);
   return words.sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
 };
 
