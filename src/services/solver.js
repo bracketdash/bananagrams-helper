@@ -6,6 +6,7 @@ import { BLACKLIST_STRING, CURRENT_SOLVE, MESSAGE, READY, TRAY, UPDATE_FUNCTION 
 // --> move the conversion of the blacklist and tray into the worker file 
 // --> use onmessage as the update listener
 // --> when the user requests a new solve, send the currently running solve the signal to stop execution
+// --> bonus: if we do this, we can use onmessage directly in app.js to skip these update layers
 
 import { downloadAndUnpackWords } from "./words";
 
