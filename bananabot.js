@@ -1,5 +1,3 @@
-// SHARED RESOURCES
-
 const byLetterCount = new Map();
 const byWordLength = new Map();
 const wordlistSet = new Set();
@@ -23,8 +21,8 @@ let part;
 let ref;
 
 fetch("/words.txt").then(async (response) => {
-  postMessage({ message: "Unpacking word list..." });
   console.time("Unpacking word list");
+  postMessage({ message: "Unpacking word list..." });
   nodes = (await response.text()).split(";");
   nodes.some((node) => {
     const symParts = pattern.exec(node);
@@ -38,42 +36,39 @@ fetch("/words.txt").then(async (response) => {
   nodes = nodes.slice(numSyms);
   processNode(0, "");
   console.timeEnd("Unpacking word list");
-  postMessage({ message: "Building initial caches..." });
-  console.time("Building initial caches");
+
+  console.time("Initializing caches");
+  postMessage({ message: "Building caches..." });
   wordlistSet.forEach(processWord);
-  console.timeEnd("Building initial caches");
-  postMessage({ message: "Post-processing words by length..." });
-  console.time("Post-processing words by length");
+  console.timeEnd("Initializing caches");
+
+  console.time("Preprocessing words by length");
   let wordsByLength = new Set();
-  [...byWordLength.keys()].sort().forEach((length) => {
-    const wordSymbols = byWordLength.get(length);
-    const justThisLength = new Set(wordSymbols);
-    byWordLength.set(length, new Set([...wordSymbols, ...wordsByLength]));
-    wordsByLength = new Set([...wordsByLength, ...justThisLength]);
-  });
-  console.timeEnd("Post-processing words by length");
-  postMessage({ message: "Post-processing words by letter count..." });
-  console.time("Post-processing words by letter count");
-  // TODO: each byLetterCount set should be words that CAN'T be built with fewer than `instances` of `letter`
-  // at this point in the code, byLetterCount.get(N) is words that have exactly N `instances` of `letter`
-  /*
-  OLD CODE BELOW
-  byLetterCount.forEach((instanceMap) => {
-    const sumSet = new Set();
-    [...instanceMap.keys()].sort().forEach((key) => {
-      const wordSet = instanceMap.get(key);
-      wordSet.forEach((wordSymbol) => {
-        sumSet.add(wordSymbol);
+  [...byWordLength.keys()]
+    .sort((a, b) => (a > b ? 1 : -1))
+    .forEach((length) => {
+      byWordLength.get(length).forEach((wordSymbol) => {
+        wordsByLength.add(wordSymbol);
       });
-      sumSet.forEach((wordSymbol) => {
-        if (!wordSet.has(wordSymbol)) {
-          wordSet.add(wordSymbol);
-        }
-      });
+      byWordLength.set(length, new Set(wordsByLength));
     });
+  console.timeEnd("Preprocessing words by length");
+
+  console.time("Preprocessing words by letter count");
+  byLetterCount.forEach((countMap) => {
+    let cumulative = new Set();
+    [...countMap.keys()]
+      .sort((a, b) => (a < b ? 1 : -1))
+      .forEach((count) => {
+        const copy = countMap.get(count);
+        countMap.set(count, new Set(cumulative));
+        copy.forEach((wordSymbol) => {
+          cumulative.add(wordSymbol);
+        });
+      });
   });
-  */
-  console.timeEnd("Post-processing words by letter count");
+  console.timeEnd("Preprocessing words by letter count");
+
   postMessage({ ready: true });
 });
 
