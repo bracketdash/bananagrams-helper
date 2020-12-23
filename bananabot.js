@@ -147,7 +147,7 @@ const processWord = (wordStr) => {
   numWordsSoFar++;
   if (newPercent !== percent) {
     percent = newPercent;
-    postMessage({ message: `Processing nodes (${percent}%)...` });
+    postMessage({ message: `Processing nodes... (${percent}%)` });
   }
 };
 

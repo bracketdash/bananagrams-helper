@@ -40,7 +40,6 @@ input {
   height: 40px;
   letter-spacing: 3px;
   line-height: 40px;
-  text-align: center;
 }
 
 .controls {
@@ -106,16 +105,16 @@ input {
   color: #999;
   font-size: 24px;
   letter-spacing: 5px;
-  padding-top: 10px;
-  text-align: center;
+  padding: 10px;
   text-transform: uppercase;
 }
 
 .message {
+  background-color: #fff;
   color: #999;
-  font-size: 14px;
-  padding: 10px 0;
-  text-align: center;
+  font-family: monospace;
+  font-size: 20px;
+  padding: 10px;
 }
 
 .show-big-message .boardbox,
@@ -124,8 +123,5 @@ input {
 }
 
 .show-big-message .message {
-  background-color: #fff;
   flex-grow: 1;
-  font-size: 40px;
-  padding-top: 2ch;
 }

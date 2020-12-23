@@ -83,18 +83,14 @@
       const App = () => {
         const [boardArr, setBoardArr] = React.useState([[" "]]);
         const [message, setMessage] = React.useState("Loading...");
-        const [showBigMsg, setShowBigMsg] = React.useState(true);
         const [remainingTray, setRemainingTray] = React.useState("");
 
         bananabot.onmessage = ({ data }) => {
           if (data.ready) {
             ready = true;
-            setMessage("Ready!");
+            setMessage("Ready.");
             solve();
             return;
-          }
-          if (ready && showBigMsg) {
-            setShowBigMsg(false);
           }
           const { boardArr, message, remainingTray } = data;
           if (boardArr) {
@@ -110,9 +106,7 @@
 
         return React.createElement(
           "div",
-          {
-            className: showBigMsg ? "show-big-message" : "",
-          },
+          null,
           React.createElement(Tray, null),
           React.createElement(Blacklist, null),
           React.createElement(
@@ -151,6 +145,7 @@
             {
               className: "tray",
             },
+            "\xA0",
             remainingTray
           ),
           React.createElement(
