@@ -100,9 +100,7 @@
           if (message) {
             setMessage(message);
           }
-          if (remainingTray) {
-            setRemainingTray(remainingTray);
-          }
+          setRemainingTray(remainingTray || "");
         };
 
         return React.createElement(

@@ -2,6 +2,12 @@ const byLetterCount = {};
 const byWordLength = new Map();
 const wordCache = {};
 
+// TODO: tray "YOURTIL" results in a false solution
+// it is missing an "L", but the "L" is also not present in the tray
+// it disappeared somehow!
+// where did it go?!
+// am i taking crazy pills?!?
+
 /* * * * * * * * * *
  * INITIALIZATION  *
  * * * * * * * * * */
