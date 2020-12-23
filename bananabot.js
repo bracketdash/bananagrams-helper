@@ -449,17 +449,17 @@ class Board {
 }
 
 class Placement {
-  constructor(board, blacklist, tray, segment, word) {
-    this.board = board;
+  constructor(board, blacklist, tray, segment, word, placements, index) {
     this.blacklist = blacklist;
-    this.tray = tray;
+    this.board = board;
+    this.index = index;
+    this.placements = placements;
     this.segment = segment;
+    this.tray = tray;
     this.word = word;
   }
 
   getDelta() {
-    // TODO: FIX
-    // Cannot read property 'undefined' of undefined
     return this.placements[this.index];
   }
 
