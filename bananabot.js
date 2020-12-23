@@ -20,9 +20,10 @@ let part;
 let ref;
 
 fetch("/words.txt").then(async (response) => {
-  postMessage({ message: "Unpacking word list..." });
+  postMessage({ message: "Splitting compressed word list string..." });
   nodes = (await response.text()).split(";");
   nodes.some((node, index) => {
+    postMessage({ message: `Generating sym ${index}...` });
     const symParts = pattern.exec(node);
     if (!symParts) {
       numSyms = index;
@@ -31,8 +32,10 @@ fetch("/words.txt").then(async (response) => {
     syms[symParts[1]] = decode(symParts[2]);
     return false;
   });
+  postMessage({ message: "Removing syms from nodes array..." });
   nodes = nodes.slice(numSyms);
   processNode(0, "");
+  postMessage({ message: "Generating word length cache..." });
   let wordsByLength = [];
   [...byWordLength.keys()]
     .sort((a, b) => (a > b ? 1 : -1))
@@ -42,6 +45,7 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
+  postMessage({ message: "Generating letter count cache..." });
   Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = [];
     [...countMap.keys()]
@@ -112,6 +116,10 @@ const processNode = (index, sofar) => {
   }
 };
 
+let percent = "0";
+let newPercent;
+let numWordsSoFar = 0;
+
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
@@ -135,6 +143,12 @@ const processWord = (wordStr) => {
   }
   byWordLength.get(wordLength).push(wordStr);
   wordCache[wordStr] = { wordArr, wordLength, wordStr };
+  newPercent = (numWordsSoFar / 2743.81).toFixed(0);
+  numWordsSoFar++;
+  if (newPercent !== percent) {
+    percent = newPercent;
+    postMessage({ message: `Processing nodes (${percent}%)...` });
+  }
 };
 
 /* * * * * *
