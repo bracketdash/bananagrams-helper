@@ -42,6 +42,11 @@ input {
   line-height: 40px;
 }
 
+.letterbox > input:placeholder-shown {
+  text-transform: unset;
+  letter-spacing: unset;
+}
+
 .controls {
   align-items: center;
   background-color: #eee;

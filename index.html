@@ -46,9 +46,10 @@
           },
           React.createElement("input", {
             autofocus: "autofocus",
+            onInput: updateTrayStr,
+            placeholder: "Enter your tiles here!",
             type: "text",
             value: trayStr,
-            onInput: updateTrayStr,
           })
         );
       };
