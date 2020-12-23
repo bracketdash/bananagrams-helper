@@ -298,6 +298,8 @@ const getSegments = (str, index, down, segments, lines) => {
     }
     perps.set(perpIndex, { left, right });
   });
+  // TODO: seems like this function isn't adding segments like it should be
+  // pattern is coming through undefined, and sometimes cols or rows is NaN
   const startingSegment = { counts, down, perps };
   getPatterns(trimmed).forEach(({ tilesLeftTrim, pattern }) => {
     const start = tilesLeftTrim + inLeft;
@@ -731,13 +733,6 @@ class Word {
 
   init() {
     const { blacklist, segment, tray } = this;
-
-    // TODO: FIX
-    console.log("segment");
-    console.log(segment);
-    console.log("segment.getPattern()");
-    console.log(segment.getPattern()); // this is undefined even though we have a segment
-
     const words = getWordsForSegment(blacklist, tray.getCountsWith(segment.getCounts()), segment.getPattern());
     if (!words.length) {
       return false;
