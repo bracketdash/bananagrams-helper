@@ -1,7 +1,7 @@
-const byLetterCount = new Map();
+const byLetterCount = {};
 const byWordLength = new Map();
-const wordlistSet = new Set();
-const wordSymbols = new Map();
+const wordlistSet = [];
+const wordSymbols = {};
 
 /* * * * * * * * * *
  * INITIALIZATION  *
@@ -39,7 +39,30 @@ fetch("/words.txt").then(async (response) => {
 
   console.time("Initializing caches");
   postMessage({ message: "Building caches..." });
-  wordlistSet.forEach(processWord);
+  wordlistSet.forEach((wordStr) => {
+    const wordArr = wordStr.split("");
+    const wordLength = wordStr.length;
+    wordArr
+      .reduce((counts, letter) => {
+        counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+        return counts;
+      }, new Map())
+      .forEach((instances, letter) => {
+        if (!byLetterCount[letter]) {
+          byLetterCount[letter] = new Map();
+        }
+        byLetter = byLetterCount[letter];
+        if (!byLetter.has(instances)) {
+          byLetter.set(instances, new Set());
+        }
+        byLetter.get(instances).add(wordStr);
+      });
+    if (!byWordLength.has(wordLength)) {
+      byWordLength.set(wordLength, new Set());
+    }
+    byWordLength.get(wordLength).add(wordStr);
+    wordSymbols[wordStr] = { wordArr, wordLength, wordStr };
+  });
   console.timeEnd("Initializing caches");
 
   console.time("Preprocessing words by length");
@@ -55,7 +78,7 @@ fetch("/words.txt").then(async (response) => {
   console.timeEnd("Preprocessing words by length");
 
   console.time("Preprocessing words by letter count");
-  byLetterCount.forEach((countMap) => {
+  Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = new Set();
     [...countMap.keys()]
       .sort((a, b) => (a < b ? 1 : -1))
@@ -68,7 +91,7 @@ fetch("/words.txt").then(async (response) => {
       });
   });
   console.timeEnd("Preprocessing words by letter count");
-  
+
   postMessage({ ready: true });
 });
 
@@ -105,8 +128,7 @@ const processNode = (index, sofar) => {
   node = nodes[index];
   let matches;
   if (node[0] === "!") {
-    wordlistSet.add(sofar);
-    processWord(sofar);
+    wordlistSet.push(sofar);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
     matches = node.split(/([A-Z0-9,]+)/g);
@@ -120,39 +142,12 @@ const processNode = (index, sofar) => {
     newSofar = sofar + part;
     ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      wordlistSet.add(newSofar);
-      processWord(newSofar);
+      wordlistSet.push(newSofar);
       continue;
     }
     nextIndex = syms.has(ref) ? syms.get(ref) : index + decode(ref) + 1 - numSyms;
     processNode(nextIndex, newSofar);
   }
-};
-
-const processWord = (wordStr) => {
-  const wordArr = wordStr.split("");
-  const wordLength = wordStr.length;
-  const wordSymbol = Symbol(wordStr);
-  wordArr
-    .reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map())
-    .forEach((instances, letter) => {
-      if (!byLetterCount.has(letter)) {
-        byLetterCount.set(letter, new Map());
-      }
-      byLetter = byLetterCount.get(letter);
-      if (!byLetter.has(instances)) {
-        byLetter.set(instances, new Set());
-      }
-      byLetter.get(instances).add(wordSymbol);
-    });
-  if (!byWordLength.has(wordLength)) {
-    byWordLength.set(wordLength, new Set());
-  }
-  byWordLength.get(wordLength).add(wordSymbol);
-  wordSymbols.set(wordSymbol, { wordArr, wordLength, wordStr });
 };
 
 /* * * * * *
@@ -354,7 +349,7 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
       entry.add(wordSymbol);
     });
     counts.forEach((count, letter) => {
-      byLetterCount.get(letter).get(count).forEach((wordSymbol) => {
+      byLetterCount[letter].get(count).forEach((wordSymbol) => {
         if (entry.has(wordSymbol)) {
           entry.delete(wordSymbol);
         }
@@ -362,8 +357,7 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     });
     const wordMap = new Map();
     entry.forEach((wordSymbol) => {
-      const wordData = wordSymbols.get(wordSymbol);
-      wordMap.set(wordData.wordStr, wordData);
+      wordMap.set(wordSymbol, wordSymbols[wordSymbol]);
     });
     comboCache.set(alphaKey, wordMap);
   }
@@ -752,13 +746,13 @@ class Word {
 
   init() {
     const { blacklist, segment, tray } = this;
-    
+
     // TODO: FIX
     console.log("segment");
     console.log(segment);
     console.log("segment.getPattern()");
     console.log(segment.getPattern()); // this is undefined even though we have a segment
-    
+
     const words = getWordsForSegment(blacklist, tray.getCountsWith(segment.getCounts()), segment.getPattern());
     if (!words.length) {
       return false;
