@@ -735,7 +735,7 @@ class Word {
   getNext() {
     const indexPlusOne = this.index + 1;
     const words = this.words;
-    if (words.size < indexPlusOne) {
+    if (words.length <= indexPlusOne) {
       return false;
     }
     return new Word(this.blacklist, this.segment, this.tray, words, indexPlusOne);
