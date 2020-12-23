@@ -1,7 +1,6 @@
 const byLetterCount = {};
 const byWordLength = new Map();
-const wordlistSet = [];
-const wordSymbols = {};
+const wordCache = {};
 
 /* * * * * * * * * *
  * INITIALIZATION  *
@@ -9,7 +8,7 @@ const wordSymbols = {};
 
 const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
 const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
-const syms = new Map();
+const syms = {};
 
 let byLetter;
 let newSofar;
@@ -21,77 +20,40 @@ let part;
 let ref;
 
 fetch("/words.txt").then(async (response) => {
-  console.time("Unpacking word list");
   postMessage({ message: "Unpacking word list..." });
   nodes = (await response.text()).split(";");
-  nodes.some((node) => {
+  nodes.some((node, index) => {
     const symParts = pattern.exec(node);
     if (!symParts) {
+      numSyms = index;
       return true;
     }
-    syms.set(symParts[1], decode(symParts[2]));
+    syms[symParts[1]] = decode(symParts[2]);
     return false;
   });
-  numSyms = syms.size;
   nodes = nodes.slice(numSyms);
   processNode(0, "");
-  console.timeEnd("Unpacking word list");
-
-  console.time("Initializing caches");
-  postMessage({ message: "Building caches..." });
-  wordlistSet.forEach((wordStr) => {
-    const wordArr = wordStr.split("");
-    const wordLength = wordStr.length;
-    wordArr
-      .reduce((counts, letter) => {
-        counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-        return counts;
-      }, new Map())
-      .forEach((instances, letter) => {
-        if (!byLetterCount[letter]) {
-          byLetterCount[letter] = new Map();
-        }
-        byLetter = byLetterCount[letter];
-        if (!byLetter.has(instances)) {
-          byLetter.set(instances, new Set());
-        }
-        byLetter.get(instances).add(wordStr);
-      });
-    if (!byWordLength.has(wordLength)) {
-      byWordLength.set(wordLength, new Set());
-    }
-    byWordLength.get(wordLength).add(wordStr);
-    wordSymbols[wordStr] = { wordArr, wordLength, wordStr };
-  });
-  console.timeEnd("Initializing caches");
-
-  console.time("Preprocessing words by length");
-  let wordsByLength = new Set();
+  let wordsByLength = [];
   [...byWordLength.keys()]
     .sort((a, b) => (a > b ? 1 : -1))
     .forEach((length) => {
       byWordLength.get(length).forEach((wordSymbol) => {
-        wordsByLength.add(wordSymbol);
+        wordsByLength.push(wordSymbol);
       });
-      byWordLength.set(length, new Set(wordsByLength));
+      byWordLength.set(length, wordsByLength.slice());
     });
-  console.timeEnd("Preprocessing words by length");
-
-  console.time("Preprocessing words by letter count");
   Object.values(byLetterCount).forEach((countMap) => {
-    let cumulative = new Set();
+    let cumulative = [];
     [...countMap.keys()]
       .sort((a, b) => (a < b ? 1 : -1))
       .forEach((count) => {
         const copy = countMap.get(count);
-        countMap.set(count, new Set(cumulative));
+        countMap.set(count, cumulative.slice());
         copy.forEach((wordSymbol) => {
-          cumulative.add(wordSymbol);
+          cumulative.push(wordSymbol);
         });
       });
   });
-  console.timeEnd("Preprocessing words by letter count");
-
   postMessage({ ready: true });
 });
 
@@ -128,7 +90,7 @@ const processNode = (index, sofar) => {
   node = nodes[index];
   let matches;
   if (node[0] === "!") {
-    wordlistSet.push(sofar);
+    processWord(sofar);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
     matches = node.split(/([A-Z0-9,]+)/g);
@@ -142,12 +104,37 @@ const processNode = (index, sofar) => {
     newSofar = sofar + part;
     ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      wordlistSet.push(newSofar);
+      processWord(newSofar);
       continue;
     }
-    nextIndex = syms.has(ref) ? syms.get(ref) : index + decode(ref) + 1 - numSyms;
+    nextIndex = syms[ref] || index + decode(ref) + 1 - numSyms;
     processNode(nextIndex, newSofar);
   }
+};
+
+const processWord = (wordStr) => {
+  const wordArr = wordStr.split("");
+  const wordLength = wordStr.length;
+  wordArr
+    .reduce((counts, letter) => {
+      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+      return counts;
+    }, new Map())
+    .forEach((instances, letter) => {
+      if (!byLetterCount[letter]) {
+        byLetterCount[letter] = new Map();
+      }
+      byLetter = byLetterCount[letter];
+      if (!byLetter.has(instances)) {
+        byLetter.set(instances, []);
+      }
+      byLetter.get(instances).push(wordStr);
+    });
+  if (!byWordLength.has(wordLength)) {
+    byWordLength.set(wordLength, []);
+  }
+  byWordLength.get(wordLength).push(wordStr);
+  wordCache[wordStr] = { wordArr, wordLength, wordStr };
 };
 
 /* * * * * *
@@ -159,7 +146,7 @@ const comboCache = new Map();
 let currSolveTimestamp;
 
 onmessage = function ({ data }) {
-  new Solve(new Set(data.blacklistStr.split(",")), new Tray(data.trayStr), new Date().getTime()).init();
+  new Solve(data.blacklistStr.split(","), new Tray(data.trayStr), new Date().getTime()).init();
 };
 
 // SOLVER FUNCTIONS
@@ -269,9 +256,7 @@ const getPlacements = (segment, word) => {
         const perpIndex = start + letterIndex;
         if (perps.has(perpIndex)) {
           const { left, right } = perps.get(perpIndex);
-          if (!isAWord(`${left || ""}${letter}${right || ""}`)) {
-            return true;
-          }
+          return !wordCache[`${left || ""}${letter}${right || ""}`];
         }
         return false;
       })
@@ -357,7 +342,7 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     });
     const wordMap = new Map();
     entry.forEach((wordSymbol) => {
-      wordMap.set(wordSymbol, wordSymbols[wordSymbol]);
+      wordMap.set(wordSymbol, wordCache[wordSymbol]);
     });
     comboCache.set(alphaKey, wordMap);
   }
@@ -374,9 +359,9 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     }
   });
   const words = [];
-  wordMap.forEach((wordData, wordStr) => {
+  wordMap.forEach((data, wordStr) => {
     if (pattern.test(wordStr)) {
-      words.push(wordData);
+      words.push(data);
     }
   });
   return words.sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
