@@ -234,12 +234,12 @@ const getPatterns = (tiles) => {
     } else {
       patterns.push({
         tilesLeftTrim,
-        pattern: moddedPattern,
+        pattern: new RegExp(moddedPattern),
       });
     }
     return loop(fullPattern, patterns, leftTrim, rightTrim + 1, tiles, tilesLeftTrim);
   };
-  return loop(fullPattern, [fullPattern], 0, 1, tiles, 0);
+  return loop(fullPattern, [{ pattern: new RegExp(fullPattern), tilesLeftTrim: 0 }], 0, 1, tiles, 0);
 };
 
 const getPlacements = (segment, word) => {
@@ -312,10 +312,8 @@ const getSegments = (str, index, down, segments, lines) => {
     }
     perps.set(perpIndex, { left, right });
   });
-  // TODO: seems like this function isn't adding segments like it should be
-  // pattern is coming through undefined, and sometimes cols or rows is NaN
   const startingSegment = { counts, down, perps };
-  getPatterns(trimmed).forEach(({ tilesLeftTrim, pattern }) => {
+  getPatterns(trimmed).forEach(({ pattern, tilesLeftTrim }) => {
     const start = tilesLeftTrim + inLeft;
     startingSegment.pattern = pattern;
     if (down) {
@@ -460,6 +458,8 @@ class Placement {
   }
 
   getDelta() {
+    // TODO: FIX
+    // Cannot read property 'undefined' of undefined
     return this.placements[this.index];
   }
 
