@@ -349,6 +349,8 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
   }
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
+    // TODO: FIX
+    // Cannot read property 'forEach' of undefined
     byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
       entry.add(wordSymbol);
     });
