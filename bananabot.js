@@ -49,18 +49,6 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
-  [...Object.values(wordCache)].forEach(({ letterCounts, wordStr }) => {
-    letterCounts.forEach((instances, letter) => {
-      if (!byLetterCount[letter]) {
-        byLetterCount[letter] = new Map();
-      }
-      const byLetter = byLetterCount[letter];
-      if (!byLetter.has(instances)) {
-        byLetter.set(instances, []);
-      }
-      byLetter.get(instances).push(wordStr);
-    });
-  });
   Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = [];
     [...countMap.keys()]
@@ -138,16 +126,22 @@ const processNode = (index, sofar) => {
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
-  if (!byWordLength.has(wordLength)) {
-    byWordLength.set(wordLength, []);
+  if (byWordLength.has(wordLength)) {
+    byWordLength.get(wordLength).push(wordStr);
+  } else {
+    byWordLength.set(wordLength, [wordStr]);
   }
-  byWordLength.get(wordLength).push(wordStr);
-  wordCache[wordStr] = {
-    letterCounts: getLetterCounts(wordArr),
-    wordArr,
-    wordLength,
-    wordStr,
-  };
+  wordCache[wordStr] = { wordArr, wordLength, wordStr };
+  getLetterCounts(wordArr).forEach((instances, letter) => {
+    if (!byLetterCount[letter]) {
+      byLetterCount[letter] = new Map();
+    }
+    const byLetter = byLetterCount[letter];
+    if (!byLetter.has(instances)) {
+      byLetter.set(instances, []);
+    }
+    byLetter.get(instances).push(wordStr);
+  });
 };
 
 /* * * * * *
