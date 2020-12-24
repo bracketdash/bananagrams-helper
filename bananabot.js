@@ -9,7 +9,7 @@ const byLetterCount = {};
 const byWordLength = new Map();
 const wordCache = {};
 
-const getLetterCounts = (arr, str) =>
+const getLetterCounts = (arr) =>
   arr.reduce((counts, letter) => {
     counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
     return counts;
@@ -26,9 +26,7 @@ const syms = {};
 let nodes;
 let numSyms;
 
-postMessage({ message: "Downloading compressed word list..." });
 fetch("/words.txt").then(async (response) => {
-  postMessage({ message: "Unpacking compressed word list..." });
   nodes = (await response.text()).split(";");
   nodes.some((node, index) => {
     const symParts = pattern.exec(node);
@@ -41,8 +39,8 @@ fetch("/words.txt").then(async (response) => {
   });
   nodes = nodes.slice(numSyms);
   postMessage({ message: "Processing nodes..." });
-  processNode(0, "", new Map());
-  postMessage({ message: "Generating word length caches..." });
+  processNode(0, "");
+  postMessage({ message: "Generating caches..." });
   let wordsByLength = [];
   [...byWordLength.keys()]
     .sort((a, b) => (a > b ? 1 : -1))
@@ -52,7 +50,6 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
-  postMessage({ message: "Generating letter count caches..." });
   [...Object.values(wordCache)].forEach(({ letterCounts, wordStr }) => {
     letterCounts.forEach((instances, letter) => {
       if (!byLetterCount[letter]) {
@@ -65,7 +62,6 @@ fetch("/words.txt").then(async (response) => {
       byLetter.get(instances).push(wordStr);
     });
   });
-  postMessage({ message: "Optimizing letter count caches..." });
   Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = [];
     [...countMap.keys()]
@@ -145,7 +141,7 @@ const processWord = (wordStr) => {
   }
   byWordLength.get(wordLength).push(wordStr);
   wordCache[wordStr] = {
-    letterCounts: getLetterCounts(wordArr, wordStr),
+    letterCounts: getLetterCounts(wordArr),
     wordArr,
     wordLength,
     wordStr,
@@ -307,8 +303,7 @@ const getSegments = (str, index, down, segments, lines) => {
   const trimmedLeft = str.trimLeft();
   const trimmed = trimmedLeft.trimRight();
   const inLeft = str.length - trimmedLeft.length;
-  const trimmedReplaced = trimmed.replace(/\s+/g, "");
-  const counts = getLetterCounts(trimmedReplaced.split(""), trimmedReplaced);
+  const counts = getLetterCounts(trimmed.replace(/\s+/g, "").split(""));
   const perps = new Map();
   [...Array(str.length).keys()].forEach((perpIndex) => {
     const wholePerp = lines[perpIndex];
@@ -719,7 +714,7 @@ class State {
 class Tray {
   constructor(trayStr) {
     this.trayStr = trayStr;
-    this.letterCounts = getLetterCounts(trayStr.split(""), trayStr);
+    this.letterCounts = getLetterCounts(trayStr.split(""));
   }
 
   getCountsWith(segmentCounts) {
