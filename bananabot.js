@@ -51,11 +51,9 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
-  console.log('freqs for "aa":');
-  console.log(wordCache.aa.freqs);
   postMessage({ message: "Generating letter count caches..." });
-  [...Object.values(wordCache)].forEach(({ wordStr }) => {
-    wordCache[wordStr].freqs.forEach((instances, letter) => {
+  [...Object.values(wordCache)].forEach(({ wordArr, wordStr }) => {
+    getLetterCounts(wordArr).forEach((instances, letter) => {
       if (!byLetterCount[letter]) {
         byLetterCount[letter] = new Map();
       }
@@ -111,13 +109,11 @@ const decode = (code) => {
   return num;
 };
 
-const processNode = (index, sofar, freqs) => {
-  // TODO: one (or more) of these `freqs` need to be wrapped in a new Map()
-  // the letter counts are not correct right now
+const processNode = (index, sofar) => {
   const node = nodes[index];
   let matches;
   if (node[0] === "!") {
-    processWord(sofar, freqs);
+    processWord(sofar);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
     matches = node.split(/([A-Z0-9,]+)/g);
@@ -131,26 +127,23 @@ const processNode = (index, sofar, freqs) => {
     if (newSofar.length > MAX_WORD_LENGTH) {
       continue;
     }
-    matches[i].split("").forEach((letter) => {
-      freqs.set(letter, freqs.has(letter) ? freqs.get(letter) + 1 : 1);
-    });
     const ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      processWord(newSofar, freqs);
+      processWord(newSofar);
       continue;
     }
-    processNode(syms[ref] || index + decode(ref) + 1 - numSyms, newSofar, freqs);
+    processNode(syms[ref] || index + decode(ref) + 1 - numSyms, newSofar);
   }
 };
 
-const processWord = (wordStr, freqs) => {
+const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
   if (!byWordLength.has(wordLength)) {
     byWordLength.set(wordLength, []);
   }
   byWordLength.get(wordLength).push(wordStr);
-  wordCache[wordStr] = { freqs, wordArr, wordLength, wordStr };
+  wordCache[wordStr] = { wordArr, wordLength, wordStr };
 };
 
 /* * * * * *
