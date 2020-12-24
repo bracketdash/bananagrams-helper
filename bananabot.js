@@ -2,16 +2,24 @@ const MAX_WORD_LENGTH = 16;
 
 const byLetterCount = {};
 const byWordLength = new Map();
+const countCache = {};
 const wordCache = {};
 
-// TODO: solutions never seem to have more than 2 words on teh board
+// TODO: FIX
+// solutions never seem to have more than 2 words on teh board
+// getting lots of false solutions (board and tray missing latters that were input by user)
 
-// TODO: tray "YOURTIL" results in a false solution
-// it is missing an "L", but the "L" is also not present in the tray
+// TODO: some tray get stuck on "Trying previous next state..." with no errors
 
-// TODO: trays "YOURTILESHER" and "YOURTILESHERE" get stuck on "Trying previous next state..."
-
-// TODO: add even more caching - first up: memoize getPatterns()
+const getLetterCounts = (str, arr) => {
+  if (!countCache[str]) {
+    countCache[str] = arr.reduce((counts, letter) => {
+      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+      return counts;
+    }, new Map());
+  }
+  return countCache[str];
+};
 
 /* * * * * * * * * *
  * INITIALIZATION  *
@@ -137,21 +145,16 @@ let numWordsSoFar = 0;
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
-  wordArr
-    .reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map())
-    .forEach((instances, letter) => {
-      if (!byLetterCount[letter]) {
-        byLetterCount[letter] = new Map();
-      }
-      byLetter = byLetterCount[letter];
-      if (!byLetter.has(instances)) {
-        byLetter.set(instances, []);
-      }
-      byLetter.get(instances).push(wordStr);
-    });
+  getLetterCounts(wordStr, wordArr).forEach((instances, letter) => {
+    if (!byLetterCount[letter]) {
+      byLetterCount[letter] = new Map();
+    }
+    byLetter = byLetterCount[letter];
+    if (!byLetter.has(instances)) {
+      byLetter.set(instances, []);
+    }
+    byLetter.get(instances).push(wordStr);
+  });
   if (!byWordLength.has(wordLength)) {
     byWordLength.set(wordLength, []);
   }
@@ -201,12 +204,6 @@ const createPlacement = (board, blacklist, tray) => {
   }
   return new Placement(board, blacklist, tray, segment, word).init();
 };
-
-const getLetterCounts = (str) =>
-  str.split("").reduce((counts, letter) => {
-    counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-    return counts;
-  }, new Map());
 
 const getPatterns = (tiles) => {
   const fullPattern = `.*${tiles.replace(/\s+/g, (m) => `.{${m.length}}`)}.*`;
@@ -326,7 +323,8 @@ const getSegments = (str, index, down, segments, lines) => {
   const trimmedLeft = str.trimLeft();
   const trimmed = trimmedLeft.trimRight();
   const inLeft = str.length - trimmedLeft.length;
-  const counts = getLetterCounts(trimmed.replace(/\s+/g, ""));
+  const justLetters = trimmed.replace(/\s+/g, "");
+  const counts = getLetterCounts(justLetters, justLetters.split(""));
   const perps = new Map();
   [...Array(str.length).keys()].forEach((perpIndex) => {
     const wholePerp = lines[perpIndex];
@@ -414,8 +412,6 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     }
   });
   return words;
-  // TODO: .sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
-  // find out if this slows the script down more than it's worth to try longer words first
 };
 
 // SOLVER CLASSES
@@ -728,7 +724,7 @@ class State {
 class Tray {
   constructor(trayStr) {
     this.trayStr = trayStr;
-    this.letterCounts = getLetterCounts(trayStr);
+    this.letterCounts = getLetterCounts(trayStr, trayStr.split(""));
   }
 
   getCountsWith(segmentCounts) {
