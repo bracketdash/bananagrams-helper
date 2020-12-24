@@ -7,13 +7,23 @@ const UPDATE_THROTTLE_MS = 40;
 
 const byLetterCount = {};
 const byWordLength = new Map();
+const countCache = {};
 const wordCache = {};
-
-let countCache = {};
 
 // TODO: the board never shows more than 2 words at a time
 // TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
 // TODO: some trays get stuck on "Trying previous next state..."
+
+/* * * * * * * * * *
+ * INITIALIZATION  *
+ * * * * * * * * * */
+
+const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
+const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
+const syms = {};
+
+let nodes;
+let numSyms;
 
 postMessage({ message: "Downloading compressed word list..." });
 fetch("/words.txt").then(async (response) => {
@@ -30,7 +40,7 @@ fetch("/words.txt").then(async (response) => {
   });
   nodes = nodes.slice(numSyms);
   postMessage({ message: "Processing nodes..." });
-  processNode(0, "");
+  processNode(0, "", new Map());
   postMessage({ message: "Generating word length caches..." });
   let wordsByLength = [];
   [...byWordLength.keys()]
@@ -41,9 +51,11 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
+  console.log('freqs for "aa":');
+  console.log(wordCache.aa.freqs);
   postMessage({ message: "Generating letter count caches..." });
-  [...Object.values(wordCache)].forEach(({ wordArr, wordStr }) => {
-    getLetterCounts(wordArr).forEach((instances, letter) => {
+  [...Object.values(wordCache)].forEach(({ wordStr }) => {
+    wordCache[wordStr].freqs.forEach((instances, letter) => {
       if (!byLetterCount[letter]) {
         byLetterCount[letter] = new Map();
       }
@@ -69,31 +81,6 @@ fetch("/words.txt").then(async (response) => {
   });
   postMessage({ message: `Finished loading in ${performance.now()} ms`, ready: true });
 });
-
-const getLetterCounts = (arr) => {
-  const key = arr.slice().sort().join("");
-  if (key in countCache) {
-    return countCache[key];
-  } else {
-    const response = arr.reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map());
-    countCache[key] = response;
-    return response;
-  }
-};
-
-/* * * * * * * * * *
- * INITIALIZATION  *
- * * * * * * * * * */
-
-const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
-const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
-const syms = {};
-
-let nodes;
-let numSyms;
 
 // INITIALIZATION FUNCTIONS
 
@@ -124,11 +111,13 @@ const decode = (code) => {
   return num;
 };
 
-const processNode = (index, sofar) => {
+const processNode = (index, sofar, freqs) => {
+  // TODO: one (or more) of these `freqs` need to be wrapped in a new Map()
+  // the letter counts are not correct right now
   const node = nodes[index];
   let matches;
   if (node[0] === "!") {
-    processWord(sofar);
+    processWord(sofar, freqs);
     matches = node.slice(1).split(/([A-Z0-9,]+)/g);
   } else {
     matches = node.split(/([A-Z0-9,]+)/g);
@@ -142,23 +131,26 @@ const processNode = (index, sofar) => {
     if (newSofar.length > MAX_WORD_LENGTH) {
       continue;
     }
+    matches[i].split("").forEach((letter) => {
+      freqs.set(letter, freqs.has(letter) ? freqs.get(letter) + 1 : 1);
+    });
     const ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
-      processWord(newSofar);
+      processWord(newSofar, freqs);
       continue;
     }
-    processNode(syms[ref] || index + decode(ref) + 1 - numSyms, newSofar);
+    processNode(syms[ref] || index + decode(ref) + 1 - numSyms, newSofar, freqs);
   }
 };
 
-const processWord = (wordStr) => {
+const processWord = (wordStr, freqs) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
   if (!byWordLength.has(wordLength)) {
     byWordLength.set(wordLength, []);
   }
   byWordLength.get(wordLength).push(wordStr);
-  wordCache[wordStr] = { wordArr, wordLength, wordStr };
+  wordCache[wordStr] = { freqs, wordArr, wordLength, wordStr };
 };
 
 /* * * * * *
@@ -192,6 +184,20 @@ const createPlacement = (board, blacklist, tray) => {
     return false;
   }
   return new Placement(board, blacklist, tray, segment, word).init();
+};
+
+const getLetterCounts = (arr) => {
+  const key = arr.slice().sort().join("");
+  if (key in countCache) {
+    return countCache[key];
+  } else {
+    const response = arr.reduce((counts, letter) => {
+      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+      return counts;
+    }, new Map());
+    countCache[key] = response;
+    return response;
+  }
 };
 
 const getPatterns = (tiles) => {
