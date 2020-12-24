@@ -19,7 +19,6 @@ const getLetterCounts = (arr) =>
  * INITIALIZATION  *
  * * * * * * * * * */
 
-const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
 const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
 const syms = {};
 
@@ -79,9 +78,14 @@ fetch("/words.txt").then(async (response) => {
 
 // INITIALIZATION FUNCTIONS
 
+const codes = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").reduce((c, v, i) => {
+  c[v] = i;
+  return c;
+}, {});
+
 const decode = (code) => {
-  if (codes.has(code)) {
-    return codes.get(code);
+  if (code.length === 1) {
+    return codes[code];
   }
   const base = 36;
   const codeLength = code.length;
@@ -102,7 +106,6 @@ const decode = (code) => {
     num += d * pow;
     pow *= base;
   }
-  codes.set(code, num);
   return num;
 };
 
@@ -115,8 +118,7 @@ const processNode = (index, sofar) => {
   } else {
     matches = node.split(/([A-Z0-9,]+)/g);
   }
-  const matchesLength = matches.length;
-  for (let i = 0; i < matchesLength; i += 2) {
+  for (let i = 0, len = matches.length; i < len; i += 2) {
     if (!matches[i]) {
       continue;
     }
