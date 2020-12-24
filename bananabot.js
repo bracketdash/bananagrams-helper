@@ -7,12 +7,13 @@ const UPDATE_THROTTLE_MS = 40;
 
 const byLetterCount = {};
 const byWordLength = new Map();
-const countCache = {};
 const wordCache = {};
 
-// TODO: the board never shows more than 2 words at a time
-// TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
-// TODO: some trays get stuck on "Trying previous next state..."
+const getLetterCounts = (arr, str) =>
+  arr.reduce((counts, letter) => {
+    counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+    return counts;
+  }, new Map());
 
 /* * * * * * * * * *
  * INITIALIZATION  *
@@ -52,8 +53,8 @@ fetch("/words.txt").then(async (response) => {
       byWordLength.set(length, wordsByLength.slice());
     });
   postMessage({ message: "Generating letter count caches..." });
-  [...Object.values(wordCache)].forEach(({ wordArr, wordStr }) => {
-    getLetterCounts(wordArr).forEach((instances, letter) => {
+  [...Object.values(wordCache)].forEach(({ letterCounts, wordStr }) => {
+    letterCounts.forEach((instances, letter) => {
       if (!byLetterCount[letter]) {
         byLetterCount[letter] = new Map();
       }
@@ -77,7 +78,7 @@ fetch("/words.txt").then(async (response) => {
         });
       });
   });
-  postMessage({ message: `Finished loading in ${performance.now()} ms`, ready: true });
+  postMessage({ message: `Finished loading in ${(performance.now() / 1000).toFixed(2)} seconds.`, ready: true });
 });
 
 // INITIALIZATION FUNCTIONS
@@ -143,12 +144,21 @@ const processWord = (wordStr) => {
     byWordLength.set(wordLength, []);
   }
   byWordLength.get(wordLength).push(wordStr);
-  wordCache[wordStr] = { wordArr, wordLength, wordStr };
+  wordCache[wordStr] = {
+    letterCounts: getLetterCounts(wordArr, wordStr),
+    wordArr,
+    wordLength,
+    wordStr,
+  };
 };
 
 /* * * * * *
  * SOLVER  *
  * * * * * */
+
+// TODO: the board never shows more than 2 words at a time
+// TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
+// TODO: some trays get stuck on "Trying previous next state..."
 
 const comboCache = new Map();
 
@@ -177,20 +187,6 @@ const createPlacement = (board, blacklist, tray) => {
     return false;
   }
   return new Placement(board, blacklist, tray, segment, word).init();
-};
-
-const getLetterCounts = (arr) => {
-  const key = arr.slice().sort().join("");
-  if (key in countCache) {
-    return countCache[key];
-  } else {
-    const response = arr.reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map());
-    countCache[key] = response;
-    return response;
-  }
 };
 
 const getPatterns = (tiles) => {
@@ -311,7 +307,8 @@ const getSegments = (str, index, down, segments, lines) => {
   const trimmedLeft = str.trimLeft();
   const trimmed = trimmedLeft.trimRight();
   const inLeft = str.length - trimmedLeft.length;
-  const counts = getLetterCounts(trimmed.replace(/\s+/g, "").split(""));
+  const trimmedReplaced = trimmed.replace(/\s+/g, "");
+  const counts = getLetterCounts(trimmedReplaced.split(""), trimmedReplaced);
   const perps = new Map();
   [...Array(str.length).keys()].forEach((perpIndex) => {
     const wholePerp = lines[perpIndex];
@@ -722,7 +719,7 @@ class State {
 class Tray {
   constructor(trayStr) {
     this.trayStr = trayStr;
-    this.letterCounts = getLetterCounts(trayStr.split(""));
+    this.letterCounts = getLetterCounts(trayStr.split(""), trayStr);
   }
 
   getCountsWith(segmentCounts) {
