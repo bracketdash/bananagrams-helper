@@ -47,6 +47,7 @@ let part;
 let ref;
 
 fetch("/words.txt").then(async (response) => {
+  const start = performance.now();
   postMessage({ message: "Unpacking word list..." });
   nodes = (await response.text()).split(";");
   nodes.some((node, index) => {
@@ -82,7 +83,7 @@ fetch("/words.txt").then(async (response) => {
         });
       });
   });
-  postMessage({ ready: true });
+  postMessage({ message: `Loaded in ${performance.now() - start} ms`, ready: true });
 });
 
 // INITIALIZATION FUNCTIONS

@@ -26,14 +26,20 @@
         if (tray) {
           trayStr = tray;
         }
-        if (!trayStr || !ready) {
+        if (!ready) {
+          console.log("Not ready yet. Will run solve when ready.");
+          return false;
+        }
+        if (!trayStr) {
           resetDisplay();
           return false;
         }
         if (postMessageTimeout) {
+          console.log("Clearing timeout...");
           clearTimeout(postMessageTimeout);
         }
         postMessageTimeout = setTimeout(() => {
+          console.log("Requesting solve...");
           bananabot.postMessage({ blacklistStr, trayStr });
         }, 200);
       };
@@ -94,17 +100,17 @@
         const [message, setMessage] = React.useState("Loading...");
         const [remainingTray, setRemainingTray] = React.useState("");
 
-        resetDisplay = () => {
+        resetDisplay = (message) => {
           setBoardArr([[" "]]);
-          setMessage("Ready.");
+          setMessage(message || "Ready.");
           setRemainingTray("");
         };
 
         bananabot.onmessage = ({ data }) => {
           if (data.ready) {
             ready = true;
-            resetDisplay();
             solve();
+            resetDisplay(data.message);
             return;
           }
           const { boardArr, message, remainingTray } = data;
