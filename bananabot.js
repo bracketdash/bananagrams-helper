@@ -638,6 +638,8 @@ class Solve {
   }
 
   tryNextStep(state, fnName, message) {
+    // TODO: something is broken in here...
+    console.log(fnName);
     return new Promise((resolve) => {
       setTimeout(() => {
         const newState = state[fnName]();
