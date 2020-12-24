@@ -4,6 +4,8 @@ const byLetterCount = {};
 const byWordLength = new Map();
 const wordCache = {};
 
+// TODO: solutions never seem to have more than 2 words on teh board
+
 // TODO: tray "YOURTIL" results in a false solution
 // it is missing an "L", but the "L" is also not present in the tray
 
