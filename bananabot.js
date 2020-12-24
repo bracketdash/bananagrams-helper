@@ -1,22 +1,30 @@
+// performance tweaks
+
 const MAX_WORD_LENGTH = 16;
+const UPDATE_THROTTLE_MS = 40;
+
+// shared vars
 
 const byLetterCount = {};
 const byWordLength = new Map();
 const countCache = {};
 const wordCache = {};
 
-// TODO: FIX
-// solutions never seem to have more than 2 words on teh board
-// getting lots of false solutions (board and tray missing latters that were input by user)
-
-// TODO: some tray get stuck on "Trying previous next state..." with no errors
+// TODO: the board never shows more than 2 words at a time
+// TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
+// TODO: some trays get stuck on "Trying previous next state..."
 
 const getLetterCounts = (str, arr) => {
-  if (!countCache[str]) {
-    countCache[str] = arr.reduce((counts, letter) => {
-      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-      return counts;
-    }, new Map());
+  if (!countCache.hasOwnProperty(str)) {
+    Object.defineProperty(countCache, str, {
+      writable: true,
+      enumerable: true,
+      configurable: true,
+      value: arr.reduce((counts, letter) => {
+        counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+        return counts;
+      }, new Map()),
+    });
   }
   return countCache[str];
 };
@@ -39,10 +47,9 @@ let part;
 let ref;
 
 fetch("/words.txt").then(async (response) => {
-  postMessage({ message: "Splitting compressed word list string..." });
+  postMessage({ message: "Unpacking word list..." });
   nodes = (await response.text()).split(";");
   nodes.some((node, index) => {
-    postMessage({ message: `Generating sym ${index}...` });
     const symParts = pattern.exec(node);
     if (!symParts) {
       numSyms = index;
@@ -51,10 +58,9 @@ fetch("/words.txt").then(async (response) => {
     syms[symParts[1]] = decode(symParts[2]);
     return false;
   });
-  postMessage({ message: "Removing syms from nodes array..." });
   nodes = nodes.slice(numSyms);
   processNode(0, "");
-  postMessage({ message: "Generating word length cache..." });
+  postMessage({ message: "Generating initial caches..." });
   let wordsByLength = [];
   [...byWordLength.keys()]
     .sort((a, b) => (a > b ? 1 : -1))
@@ -64,7 +70,6 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
-  postMessage({ message: "Generating letter count cache..." });
   Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = [];
     [...countMap.keys()]
@@ -159,7 +164,12 @@ const processWord = (wordStr) => {
     byWordLength.set(wordLength, []);
   }
   byWordLength.get(wordLength).push(wordStr);
-  wordCache[wordStr] = { wordArr, wordLength, wordStr };
+  Object.defineProperty(wordCache, wordStr, {
+    writable: true,
+    enumerable: true,
+    configurable: true,
+    value: { wordArr, wordLength, wordStr },
+  });
   newPercent = (numWordsSoFar / 2743.81).toFixed(0);
   numWordsSoFar++;
   if (newPercent !== percent) {
@@ -175,13 +185,9 @@ const processWord = (wordStr) => {
 const comboCache = new Map();
 
 let currSolveTimestamp;
+let lastMessageTime = new Date().getTime();
 
 onmessage = function ({ data }) {
-  postMessage({
-    boardArr: [[" "]],
-    message: "Starting solver...",
-    remainingTray: "",
-  });
   const solve = new Solve(data.blacklistStr.split(","), new Tray(data.trayStr), new Date().getTime());
   setTimeout(() => {
     if (solve.getTimestamp() !== currSolveTimestamp) {
@@ -292,7 +298,7 @@ const getPlacements = (segment, word) => {
         const perpIndex = start + letterIndex;
         if (perps.has(perpIndex)) {
           const { left, right } = perps.get(perpIndex);
-          return !wordCache[`${left || ""}${letter}${right || ""}`];
+          return !(`${left || ""}${letter}${right || ""}` in wordCache);
         }
         return false;
       })
@@ -625,18 +631,22 @@ class Solve {
   }
 
   handleUpdate(state, message) {
-    postMessage({
-      boardArr: state.getBoard().getArray(),
-      message,
-      remainingTray: state.getTray().getString(),
-    });
+    const now = new Date().getTime();
+    if (now - lastMessageTime > UPDATE_THROTTLE_MS) {
+      lastMessageTime = now;
+      postMessage({
+        boardArr: state.getBoard().getArray(),
+        message,
+        remainingTray: state.getTray().getString(),
+      });
+    }
   }
 
   init() {
     this.step(new State(this.blacklist, new Board(), this.tray));
   }
 
-  step(state) {
+  async step(state) {
     if (this.timestamp !== currSolveTimestamp) {
       return;
     }
@@ -644,11 +654,11 @@ class Solve {
       this.handleUpdate(state, "Solution found!");
       return;
     }
-    if (!this.tryNextStep(state.getNext(), "Trying next state...")) {
-      if (!this.tryNextStep(state.getAdvanced(), "Advancing state...")) {
+    if (!(await this.tryNextStep(state, "getNext", "Trying next state..."))) {
+      if (!(await this.tryNextStep(state, "getAdvanced", "Advancing state..."))) {
         let prevState = state.getPrev();
         while (prevState) {
-          if (this.tryNextStep(prevState.getNext(), "Trying previous next state...")) {
+          if (await this.tryNextStep(prevState, "getNext", "Trying previous next state...")) {
             return;
           }
           prevState = prevState.getPrev();
@@ -658,13 +668,20 @@ class Solve {
     }
   }
 
-  tryNextStep(state, message) {
-    if (state) {
-      this.handleUpdate(state, message);
-      setTimeout(() => this.step(state));
-      return true;
-    }
-    return false;
+  tryNextStep(state, fnName, message) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newState = state[fnName]();
+        if (newState) {
+          this.handleUpdate(newState, message);
+          this.step(newState);
+          resolve(true);
+        } else {
+          postMessage({ message });
+          resolve(false);
+        }
+      });
+    });
   }
 }
 

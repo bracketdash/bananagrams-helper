@@ -15,7 +15,9 @@
 
       let blacklistStr = "";
       let ready = false;
+      let resetDisplay;
       let trayStr = "";
+      let postMessageTimeout;
 
       const solve = (tray, blacklist) => {
         if (blacklist) {
@@ -25,9 +27,15 @@
           trayStr = tray;
         }
         if (!trayStr || !ready) {
-          return;
+          resetDisplay();
+          return false;
         }
-        bananabot.postMessage({ blacklistStr, trayStr });
+        if (postMessageTimeout) {
+          clearTimeout(postMessageTimeout);
+        }
+        postMessageTimeout = setTimeout(() => {
+          bananabot.postMessage({ blacklistStr, trayStr });
+        }, 200);
       };
 
       const Tray = () => {
@@ -86,10 +94,16 @@
         const [message, setMessage] = React.useState("Loading...");
         const [remainingTray, setRemainingTray] = React.useState("");
 
+        resetDisplay = () => {
+          setBoardArr([[" "]]);
+          setMessage("Ready.");
+          setRemainingTray("");
+        };
+
         bananabot.onmessage = ({ data }) => {
           if (data.ready) {
             ready = true;
-            setMessage("Ready.");
+            resetDisplay();
             solve();
             return;
           }
