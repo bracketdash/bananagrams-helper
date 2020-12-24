@@ -148,10 +148,6 @@ const processWord = (wordStr) => {
  * SOLVER  *
  * * * * * */
 
-// TODO: the board never shows more than 2 words at a time
-// TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
-// TODO: some trays get stuck on "Trying previous next state..."
-
 const comboCache = new Map();
 
 let currSolveTimestamp;
@@ -601,7 +597,7 @@ class Solve {
 
   handleUpdate(state, message) {
     const now = new Date().getTime();
-    if (now - lastMessageTime > UPDATE_THROTTLE_MS) {
+    if (now - lastMessageTime > UPDATE_THROTTLE_MS || state.isSolved() || message === "No solutions possible!") {
       lastMessageTime = now;
       postMessage({
         boardArr: state.getBoard().getArray(),
@@ -638,8 +634,6 @@ class Solve {
   }
 
   tryNextStep(state, fnName, message) {
-    // TODO: something is broken in here...
-    console.log(fnName);
     return new Promise((resolve) => {
       setTimeout(() => {
         const newState = state[fnName]();
@@ -670,6 +664,10 @@ class State {
     if (!placement) {
       return false;
     }
+    if (!placement.getPlacedTiles()) {
+      // TODO: this is sometimes blank which is causing infinite loops
+      // We shouldn't have blank placements in the first place though
+    }
     return new State(this.blacklist, this.board.getNext(placement.getDelta()), this.tray.getNext(placement.getPlacedTiles()), this, placement);
   }
 
@@ -681,15 +679,11 @@ class State {
     if (!this.parent) {
       return false;
     }
-    const currPlacement = this.parent.getPlacement();
-    if (!currPlacement) {
-      return false;
-    }
-    const placement = currPlacement.getNext();
+    const placement = this.placement.getNext();
     if (!placement) {
       return false;
     }
-    return new State(this.blacklist, this.board.getNext(placement.getDelta()), this.tray.getNext(placement.getPlacedTiles()), this, placement);
+    return new State(this.blacklist, this.parent.getBoard().getNext(placement.getDelta()), this.parent.getTray().getNext(placement.getPlacedTiles()), this.parent, placement);
   }
 
   getPlacement() {
@@ -732,6 +726,7 @@ class Tray {
     tilesToRemove.forEach((tileToRemove) => {
       newTrayStr = newTrayStr.replace(tileToRemove, "");
     });
+    console.log(`"${this.trayStr}" => "${newTrayStr}"`);
     return new Tray(newTrayStr);
   }
 
