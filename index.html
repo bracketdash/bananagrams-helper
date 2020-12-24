@@ -27,7 +27,6 @@
           trayStr = tray;
         }
         if (!ready) {
-          console.log("Not ready yet. Will run solve when ready.");
           return false;
         }
         if (!trayStr) {
@@ -35,11 +34,9 @@
           return false;
         }
         if (postMessageTimeout) {
-          console.log("Clearing timeout...");
           clearTimeout(postMessageTimeout);
         }
         postMessageTimeout = setTimeout(() => {
-          console.log("Requesting solve...");
           bananabot.postMessage({ blacklistStr, trayStr });
         }, 200);
       };
@@ -110,6 +107,7 @@
           if (data.ready) {
             ready = true;
             solve();
+            console.log(performance.now().toFixed(0), data.message);
             resetDisplay(data.message);
             return;
           }
@@ -119,6 +117,9 @@
           }
           if (message) {
             setMessage(message);
+            if (!ready) {
+              console.log(performance.now() < 1000 ? "0" + performance.now().toFixed(0) : performance.now().toFixed(0), data.message);
+            }
           }
           setRemainingTray(remainingTray || "");
         };

@@ -1,54 +1,23 @@
 // performance tweaks
 
-const MAX_WORD_LENGTH = 16;
+const MAX_WORD_LENGTH = 14;
 const UPDATE_THROTTLE_MS = 40;
 
 // shared vars
 
 const byLetterCount = {};
 const byWordLength = new Map();
-const countCache = {};
 const wordCache = {};
+
+let countCache = {};
 
 // TODO: the board never shows more than 2 words at a time
 // TODO: getting false solutions (missing tray letters) (i.e. "YOURTI")
 // TODO: some trays get stuck on "Trying previous next state..."
 
-const getLetterCounts = (str, arr) => {
-  if (!countCache.hasOwnProperty(str)) {
-    Object.defineProperty(countCache, str, {
-      writable: true,
-      enumerable: true,
-      configurable: true,
-      value: arr.reduce((counts, letter) => {
-        counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
-        return counts;
-      }, new Map()),
-    });
-  }
-  return countCache[str];
-};
-
-/* * * * * * * * * *
- * INITIALIZATION  *
- * * * * * * * * * */
-
-const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
-const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
-const syms = {};
-
-let byLetter;
-let newSofar;
-let nextIndex;
-let node;
-let nodes;
-let numSyms;
-let part;
-let ref;
-
+postMessage({ message: "Downloading compressed word list..." });
 fetch("/words.txt").then(async (response) => {
-  const start = performance.now();
-  postMessage({ message: "Unpacking word list..." });
+  postMessage({ message: "Unpacking compressed word list..." });
   nodes = (await response.text()).split(";");
   nodes.some((node, index) => {
     const symParts = pattern.exec(node);
@@ -60,8 +29,9 @@ fetch("/words.txt").then(async (response) => {
     return false;
   });
   nodes = nodes.slice(numSyms);
+  postMessage({ message: "Processing nodes..." });
   processNode(0, "");
-  postMessage({ message: "Generating initial caches..." });
+  postMessage({ message: "Generating word length caches..." });
   let wordsByLength = [];
   [...byWordLength.keys()]
     .sort((a, b) => (a > b ? 1 : -1))
@@ -71,6 +41,20 @@ fetch("/words.txt").then(async (response) => {
       });
       byWordLength.set(length, wordsByLength.slice());
     });
+  postMessage({ message: "Generating letter count caches..." });
+  [...Object.values(wordCache)].forEach(({ wordArr, wordStr }) => {
+    getLetterCounts(wordArr).forEach((instances, letter) => {
+      if (!byLetterCount[letter]) {
+        byLetterCount[letter] = new Map();
+      }
+      const byLetter = byLetterCount[letter];
+      if (!byLetter.has(instances)) {
+        byLetter.set(instances, []);
+      }
+      byLetter.get(instances).push(wordStr);
+    });
+  });
+  postMessage({ message: "Optimizing letter count caches..." });
   Object.values(byLetterCount).forEach((countMap) => {
     let cumulative = [];
     [...countMap.keys()]
@@ -83,8 +67,33 @@ fetch("/words.txt").then(async (response) => {
         });
       });
   });
-  postMessage({ message: `Loaded in ${performance.now() - start} ms`, ready: true });
+  postMessage({ message: `Finished loading in ${performance.now()} ms`, ready: true });
 });
+
+const getLetterCounts = (arr) => {
+  const key = arr.slice().sort().join("");
+  if (key in countCache) {
+    return countCache[key];
+  } else {
+    const response = arr.reduce((counts, letter) => {
+      counts.set(letter, counts.has(letter) ? counts.get(letter) + 1 : 1);
+      return counts;
+    }, new Map());
+    countCache[key] = response;
+    return response;
+  }
+};
+
+/* * * * * * * * * *
+ * INITIALIZATION  *
+ * * * * * * * * * */
+
+const codes = new Map("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, n) => [c, n]));
+const pattern = new RegExp("([0-9A-Z]+):([0-9A-Z]+)");
+const syms = {};
+
+let nodes;
+let numSyms;
 
 // INITIALIZATION FUNCTIONS
 
@@ -116,7 +125,7 @@ const decode = (code) => {
 };
 
 const processNode = (index, sofar) => {
-  node = nodes[index];
+  const node = nodes[index];
   let matches;
   if (node[0] === "!") {
     processWord(sofar);
@@ -126,57 +135,30 @@ const processNode = (index, sofar) => {
   }
   const matchesLength = matches.length;
   for (let i = 0; i < matchesLength; i += 2) {
-    part = matches[i];
-    if (!part) {
+    if (!matches[i]) {
       continue;
     }
-    newSofar = sofar + part;
+    const newSofar = sofar + matches[i];
     if (newSofar.length > MAX_WORD_LENGTH) {
       continue;
     }
-    ref = matches[i + 1];
+    const ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
       processWord(newSofar);
       continue;
     }
-    nextIndex = syms[ref] || index + decode(ref) + 1 - numSyms;
-    processNode(nextIndex, newSofar);
+    processNode(syms[ref] || index + decode(ref) + 1 - numSyms, newSofar);
   }
 };
-
-let percent = "0";
-let newPercent;
-let numWordsSoFar = 0;
 
 const processWord = (wordStr) => {
   const wordArr = wordStr.split("");
   const wordLength = wordStr.length;
-  getLetterCounts(wordStr, wordArr).forEach((instances, letter) => {
-    if (!byLetterCount[letter]) {
-      byLetterCount[letter] = new Map();
-    }
-    byLetter = byLetterCount[letter];
-    if (!byLetter.has(instances)) {
-      byLetter.set(instances, []);
-    }
-    byLetter.get(instances).push(wordStr);
-  });
   if (!byWordLength.has(wordLength)) {
     byWordLength.set(wordLength, []);
   }
   byWordLength.get(wordLength).push(wordStr);
-  Object.defineProperty(wordCache, wordStr, {
-    writable: true,
-    enumerable: true,
-    configurable: true,
-    value: { wordArr, wordLength, wordStr },
-  });
-  newPercent = (numWordsSoFar / 2743.81).toFixed(0);
-  numWordsSoFar++;
-  if (newPercent !== percent) {
-    percent = newPercent;
-    postMessage({ message: `Processing nodes... (${percent}%)` });
-  }
+  wordCache[wordStr] = { wordArr, wordLength, wordStr };
 };
 
 /* * * * * *
@@ -330,8 +312,7 @@ const getSegments = (str, index, down, segments, lines) => {
   const trimmedLeft = str.trimLeft();
   const trimmed = trimmedLeft.trimRight();
   const inLeft = str.length - trimmedLeft.length;
-  const justLetters = trimmed.replace(/\s+/g, "");
-  const counts = getLetterCounts(justLetters, justLetters.split(""));
+  const counts = getLetterCounts(trimmed.replace(/\s+/g, "").split(""));
   const perps = new Map();
   [...Array(str.length).keys()].forEach((perpIndex) => {
     const wholePerp = lines[perpIndex];
@@ -742,7 +723,7 @@ class State {
 class Tray {
   constructor(trayStr) {
     this.trayStr = trayStr;
-    this.letterCounts = getLetterCounts(trayStr, trayStr.split(""));
+    this.letterCounts = getLetterCounts(trayStr.split(""));
   }
 
   getCountsWith(segmentCounts) {
