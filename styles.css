@@ -78,18 +78,24 @@ input {
 }
 
 .boardbox {
-  align-items: center;
   background-color: #fff;
-  display: flex;
   flex-grow: 1;
-  justify-content: center;
-  padding: 10px 0;
+  overflow: auto;
+}
+
+.boardbox > .board {
+  padding: 50px;
+  width: fit-content;
+}
+
+.boardbox > .board > .row {
+  display: flex;
+  white-space: nowrap;
 }
 
 .boardbox > .board > .row > .cell {
   border-radius: 3px;
   border: 1px solid #000;
-  display: inline-block;
   font-size: 24px;
   font-weight: bold;
   height: 40px;
@@ -99,6 +105,7 @@ input {
   text-transform: uppercase;
   vertical-align: text-top;
   width: 40px;
+  min-width: 40px;
 }
 
 .boardbox > .board > .row > .cell.empty {

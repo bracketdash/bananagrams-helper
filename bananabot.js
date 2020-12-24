@@ -1,4 +1,4 @@
-const MAX_WORD_LENGTH = 13;
+const MAX_WORD_LENGTH = 16;
 
 const byLetterCount = {};
 const byWordLength = new Map();
@@ -413,7 +413,9 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
       words.push(data);
     }
   });
-  return words.sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
+  return words;
+  // TODO: .sort((a, b) => (a.wordLength < b.wordLength ? 1 : -1));
+  // find out if this slows the script down more than it's worth to try longer words first
 };
 
 // SOLVER CLASSES
