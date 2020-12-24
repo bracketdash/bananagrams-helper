@@ -1,3 +1,5 @@
+const MAX_WORD_LENGTH = 13;
+
 const byLetterCount = {};
 const byWordLength = new Map();
 const wordCache = {};
@@ -6,6 +8,8 @@ const wordCache = {};
 // it is missing an "L", but the "L" is also not present in the tray
 
 // TODO: trays "YOURTILESHER" and "YOURTILESHERE" get stuck on "Trying previous next state..."
+
+// TODO: add even more caching - first up: memoize getPatterns()
 
 /* * * * * * * * * *
  * INITIALIZATION  *
@@ -111,6 +115,9 @@ const processNode = (index, sofar) => {
       continue;
     }
     newSofar = sofar + part;
+    if (newSofar.length > MAX_WORD_LENGTH) {
+      continue;
+    }
     ref = matches[i + 1];
     if (ref === "," || ref === undefined) {
       processWord(newSofar);
@@ -165,7 +172,18 @@ const comboCache = new Map();
 let currSolveTimestamp;
 
 onmessage = function ({ data }) {
-  new Solve(data.blacklistStr.split(","), new Tray(data.trayStr), new Date().getTime()).init();
+  postMessage({
+    boardArr: [[" "]],
+    message: "Starting solver...",
+    remainingTray: "",
+  });
+  const solve = new Solve(data.blacklistStr.split(","), new Tray(data.trayStr), new Date().getTime());
+  setTimeout(() => {
+    if (solve.getTimestamp() !== currSolveTimestamp) {
+      return;
+    }
+    solve.init();
+  });
 };
 
 // SOLVER FUNCTIONS
@@ -342,25 +360,28 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
     .sort()
     .join("");
   let alphaKeyLength = alphaKey.length;
-  if (alphaKeyLength === 26) {
-    alphaKeyLength = 25;
+  if (alphaKeyLength > MAX_WORD_LENGTH) {
+    alphaKeyLength = MAX_WORD_LENGTH;
   } else if (alphaKeyLength > 28) {
     alphaKeyLength = 28;
+  } else if (alphaKeyLength === 26) {
+    alphaKeyLength = 25;
   }
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
-    // TODO: FIX
-    // Tray: ALRIGHTLETSTRYTHISNOWMAYBEWEM
-    // Cannot read property 'forEach' of undefined
-    byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
+    let key = alphaKeyLength;
+    while (!byWordLength.has(key)) {
+      key--;
+    }
+    byWordLength.get(key).forEach((wordSymbol) => {
       entry.add(wordSymbol);
     });
     counts.forEach((count, letter) => {
-      let key = count;
-      while (!byLetterCount[letter].has(key)) {
-        key--;
+      let countKey = count;
+      while (!byLetterCount[letter].has(countKey)) {
+        countKey--;
       }
-      byLetterCount[letter].get(key).forEach((wordSymbol) => {
+      byLetterCount[letter].get(countKey).forEach((wordSymbol) => {
         if (entry.has(wordSymbol)) {
           entry.delete(wordSymbol);
         }
@@ -597,6 +618,10 @@ class Solve {
     this.blacklist = blacklist;
     this.timestamp = timestamp;
     this.tray = tray;
+  }
+
+  getTimestamp() {
+    return this.timestamp;
   }
 
   handleUpdate(state, message) {
