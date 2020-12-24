@@ -349,16 +349,18 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
   }
   if (!comboCache.has(alphaKey)) {
     const entry = new Set();
+    // TODO: FIX
+    // Tray: ALRIGHTLETSTRYTHISNOWMAYBEWEM
+    // Cannot read property 'forEach' of undefined
     byWordLength.get(alphaKey.length).forEach((wordSymbol) => {
       entry.add(wordSymbol);
     });
     counts.forEach((count, letter) => {
-      // TODO: FIX (tray: "LETUSTRYANOTHERSETOFLETT")
-      // Cannot read property 'forEach' of undefined
-      console.log([...byLetterCount[letter].keys()]); // [1, 2, 3, 4, 5]
-      console.log(count); // 6 <-- how/why is this coming through?
-      console.log(byLetterCount[letter].get(count)); // undefined
-      byLetterCount[letter].get(count).forEach((wordSymbol) => {
+      let key = count;
+      while (!byLetterCount[letter].has(key)) {
+        key--;
+      }
+      byLetterCount[letter].get(key).forEach((wordSymbol) => {
         if (entry.has(wordSymbol)) {
           entry.delete(wordSymbol);
         }
