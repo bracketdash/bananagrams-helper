@@ -107,7 +107,6 @@
           if (data.ready) {
             ready = true;
             solve();
-            console.log(performance.now().toFixed(0), data.message);
             resetDisplay(data.message);
             return;
           }
@@ -117,9 +116,6 @@
           }
           if (message) {
             setMessage(message);
-            if (!ready) {
-              console.log(performance.now() < 1000 ? "0" + performance.now().toFixed(0) : performance.now().toFixed(0), data.message);
-            }
           }
           setRemainingTray(remainingTray || "");
         };
