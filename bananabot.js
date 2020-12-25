@@ -545,7 +545,6 @@ class Segment {
   }
 
   init() {
-    // TODO: this is returning false for every `down` segment that would be
     const boardArr = this.boardArr;
     if (boardArr.length === 1 && boardArr[0].length === 1) {
       this.segments = [
@@ -577,6 +576,8 @@ class Segment {
     columns.forEach((colStr, colIndex) => {
       getSegments(colStr, colIndex, true, segments, rows);
     });
+    // TODO: at some point after this these down segments are prematurely disappearing...
+    console.log(segments.filter((s) => s.down));
     if (!segments.length) {
       return false;
     }
