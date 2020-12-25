@@ -283,8 +283,9 @@ const getPlacements = (segment, word) => {
         tiles = tiles.replace(letter, "");
       });
     });
-
-    placements.push({ col, down, row, tilesArr: tiles.split(""), wordArr });
+    if (tiles !== "") {
+      placements.push({ col, down, row, tilesArr: tiles.split(""), wordArr });
+    }
 
     index = lastIndex + (index || 1);
   }
@@ -664,10 +665,6 @@ class State {
     if (!placement) {
       return false;
     }
-    if (!placement.getPlacedTiles()) {
-      // TODO: this is sometimes blank which is causing infinite loops
-      // We shouldn't have blank placements in the first place though
-    }
     return new State(this.blacklist, this.board.getNext(placement.getDelta()), this.tray.getNext(placement.getPlacedTiles()), this, placement);
   }
 
@@ -726,7 +723,6 @@ class Tray {
     tilesToRemove.forEach((tileToRemove) => {
       newTrayStr = newTrayStr.replace(tileToRemove, "");
     });
-    console.log(`"${this.trayStr}" => "${newTrayStr}"`);
     return new Tray(newTrayStr);
   }
 
