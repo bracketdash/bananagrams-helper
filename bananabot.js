@@ -289,6 +289,8 @@ const getPlacements = (segment, word) => {
 
     index = lastIndex + (index || 1);
   }
+  if (!down) console.log(placements.length);
+  // TODO: why are we nevber getting any down segments?
   return placements;
 };
 
@@ -383,7 +385,7 @@ const getWordsForSegment = (blacklist, counts, pattern) => {
       words.push(data);
     }
   });
-  return words;
+  return words.sort((a, b) => (a.length > b.length ? 1 : -1));
 };
 
 // SOLVER CLASSES
@@ -620,8 +622,8 @@ class Solve {
       this.handleUpdate(state, "Solution found!");
       return;
     }
-    if (!(await this.tryNextStep(state, "getNext", "Trying next state..."))) {
-      if (!(await this.tryNextStep(state, "getAdvanced", "Advancing state..."))) {
+    if (!(await this.tryNextStep(state, "getAdvanced", "Advancing state..."))) {
+      if (!(await this.tryNextStep(state, "getNext", "Trying next state..."))) {
         let prevState = state.getPrev();
         while (prevState) {
           if (await this.tryNextStep(prevState, "getNext", "Trying previous next state...")) {
@@ -639,10 +641,12 @@ class Solve {
       setTimeout(() => {
         const newState = state[fnName]();
         if (newState) {
+          if (fnName === "getAdvanced") console.log(`${fnName} passed!`);
           this.handleUpdate(newState, message);
           this.step(newState);
           resolve(true);
         } else {
+          // console.log(`${fnName} failed.`);
           postMessage({ message });
           resolve(false);
         }
