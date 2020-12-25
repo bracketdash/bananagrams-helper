@@ -170,6 +170,8 @@ const createPlacement = (board, blacklist, tray) => {
   if (!segment) {
     return false;
   }
+  // TODO: `down` segments are not making it this far...
+  if (!segment.getData().down) console.log(segment);
   const word = new Word(blacklist, segment, tray).init();
   if (!word) {
     return false;
@@ -250,7 +252,7 @@ const getPlacements = (segment, word) => {
   let index = 0;
   let lastIndex;
   let start;
-
+  
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
     index = wordStr.slice(index).search(pattern);
@@ -289,8 +291,6 @@ const getPlacements = (segment, word) => {
 
     index = lastIndex + (index || 1);
   }
-  if (!down) console.log(placements.length);
-  // TODO: why are we nevber getting any down segments?
   return placements;
 };
 
@@ -641,12 +641,10 @@ class Solve {
       setTimeout(() => {
         const newState = state[fnName]();
         if (newState) {
-          if (fnName === "getAdvanced") console.log(`${fnName} passed!`);
           this.handleUpdate(newState, message);
           this.step(newState);
           resolve(true);
         } else {
-          // console.log(`${fnName} failed.`);
           postMessage({ message });
           resolve(false);
         }
