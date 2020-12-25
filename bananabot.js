@@ -1,6 +1,6 @@
 // performance tweaks
 
-const MAX_WORD_LENGTH = 14;
+const MAX_WORD_LENGTH = 10;
 const UPDATE_THROTTLE_MS = 40;
 
 // shared vars
@@ -237,6 +237,7 @@ const getPatterns = (tiles) => {
 };
 
 const getPlacements = (segment, word) => {
+  // TODO: invalid placements are making it through - placements should not replace existing tiles on the board
   const placements = [];
 
   const segmentData = segment.getData();
@@ -250,7 +251,7 @@ const getPlacements = (segment, word) => {
   let index = 0;
   let lastIndex;
   let start;
-  
+
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
     index = wordStr.slice(index).search(pattern);
@@ -570,14 +571,21 @@ class Segment {
       });
       return cols.join("");
     });
-    rows.forEach((rowStr, rowIndex) => {
-      getSegments(rowStr, rowIndex, false, segments, columns);
-    });
-    columns.forEach((colStr, colIndex) => {
-      getSegments(colStr, colIndex, true, segments, rows);
-    });
-    // TODO: at some point after this these down segments are prematurely disappearing...
-    console.log(segments.filter((s) => s.down));
+    if (Date.now() % 2) {
+      rows.forEach((rowStr, rowIndex) => {
+        getSegments(rowStr, rowIndex, false, segments, columns);
+      });
+      columns.forEach((colStr, colIndex) => {
+        getSegments(colStr, colIndex, true, segments, rows);
+      });
+    } else {
+      columns.forEach((colStr, colIndex) => {
+        getSegments(colStr, colIndex, true, segments, rows);
+      });
+      rows.forEach((rowStr, rowIndex) => {
+        getSegments(rowStr, rowIndex, false, segments, columns);
+      });
+    }
     if (!segments.length) {
       return false;
     }
@@ -631,6 +639,7 @@ class Solve {
           }
           prevState = prevState.getPrev();
         }
+        // TODO: this is sometimes happening prematurely?
         this.handleUpdate(state, "No solutions possible!");
       }
     }
@@ -645,7 +654,7 @@ class Solve {
           this.step(newState);
           resolve(true);
         } else {
-          postMessage({ message });
+          this.handleUpdate(state, message);
           resolve(false);
         }
       });
