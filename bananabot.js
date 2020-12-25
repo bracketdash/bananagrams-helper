@@ -170,8 +170,6 @@ const createPlacement = (board, blacklist, tray) => {
   if (!segment) {
     return false;
   }
-  // TODO: `down` segments are not making it this far...
-  if (!segment.getData().down) console.log(segment);
   const word = new Word(blacklist, segment, tray).init();
   if (!word) {
     return false;
@@ -547,6 +545,7 @@ class Segment {
   }
 
   init() {
+    // TODO: this is returning false for every `down` segment that would be
     const boardArr = this.boardArr;
     if (boardArr.length === 1 && boardArr[0].length === 1) {
       this.segments = [
