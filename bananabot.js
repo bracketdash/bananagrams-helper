@@ -243,11 +243,6 @@ const getPlacements = (segment, word, blacklist) => {
   const segmentData = segment.getData();
   const { down, pattern, perps, tiles } = segmentData;
   let { col, row } = segmentData;
-
-  if (!tiles) {
-    console.log(segmentData);
-    throw "!tiles";
-  }
   
   const wordArr = word.getArray();
   const wordStr = word.getString();
@@ -259,27 +254,19 @@ const getPlacements = (segment, word, blacklist) => {
 
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
-
-    // TODO: this is supposed to make sure we aren't replacing tiles on the board
-    // it does not appear to be working?
     index = wordStr.slice(index).search(pattern);
-
     if (index === -1) {
       continue;
     }
-
-    // TODO: test to see if an already-placed tile would be replaced by this placement
-    // if so, log some data so we can figure out what's going on
-
     start = (down ? row : col) - index;
     if (
       wordArr.some((letter, letterIndex) => {
         const perpIndex = start + letterIndex;
 
-        // TODO
+        // TODO: the String.prototype.search usage above clearly isn't working the way we had hoped...
         if ([undefined, " ", letter].indexOf(tiles[perpIndex]) === -1) {
           console.log(`tiles[${perpIndex}] (${tiles[perpIndex]}) !== letter (${letter})`);
-          throw "DEBUG STOPPER";
+          throw new Error("BUG: placements that would replace tiles shouldn't have made it this far...");
         }
 
         if (perps.has(perpIndex)) {
