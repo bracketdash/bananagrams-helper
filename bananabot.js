@@ -236,8 +236,7 @@ const getPatterns = (tiles) => {
   return loop(fullPattern, [{ pattern: new RegExp(fullPattern), tilesLeftTrim: 0 }], 0, 1, tiles, 0);
 };
 
-const getPlacements = (segment, word) => {
-  // TODO: invalid placements are making it through - placements should not replace existing tiles on the board
+const getPlacements = (segment, word, blacklist) => {
   const placements = [];
 
   const segmentData = segment.getData();
@@ -254,6 +253,8 @@ const getPlacements = (segment, word) => {
 
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
+    // TODO: this is supposed to make sure we aren't replacing tiles on the board
+    // it does not appear to be working?
     index = wordStr.slice(index).search(pattern);
     if (index === -1) {
       continue;
@@ -265,7 +266,8 @@ const getPlacements = (segment, word) => {
         const perpIndex = start + letterIndex;
         if (perps.has(perpIndex)) {
           const { left, right } = perps.get(perpIndex);
-          return !(`${left || ""}${letter}${right || ""}` in wordCache);
+          const maybeWord = `${left || ""}${letter}${right || ""}`;
+          return blacklist.includes(maybeWord) || !(maybeWord in wordCache);
         }
         return false;
       })
@@ -508,7 +510,7 @@ class Placement {
   }
 
   init() {
-    const placements = getPlacements(this.segment, this.word);
+    const placements = getPlacements(this.segment, this.word, this.blacklist);
     if (!placements.length) {
       return false;
     }
@@ -639,7 +641,6 @@ class Solve {
           }
           prevState = prevState.getPrev();
         }
-        // TODO: this is sometimes happening prematurely?
         this.handleUpdate(state, "No solutions possible!");
       }
     }
