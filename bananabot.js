@@ -227,22 +227,28 @@ const getPatterns = (tiles) => {
       return loop(fullPattern, patterns, leftTrim + 1, 0, tiles, tilesLeftTrim);
     } else {
       patterns.push({
-        tilesLeftTrim,
         pattern: new RegExp(moddedPattern),
+        tiles: tiles.slice(tilesLeftTrim),
+        tilesLeftTrim,
       });
     }
     return loop(fullPattern, patterns, leftTrim, rightTrim + 1, tiles, tilesLeftTrim);
   };
-  return loop(fullPattern, [{ pattern: new RegExp(fullPattern), tilesLeftTrim: 0 }], 0, 1, tiles, 0);
+  return loop(fullPattern, [{ pattern: new RegExp(fullPattern), tiles, tilesLeftTrim: 0 }], 0, 1, tiles, 0);
 };
 
 const getPlacements = (segment, word, blacklist) => {
   const placements = [];
 
   const segmentData = segment.getData();
-  const { down, pattern, perps } = segmentData;
+  const { down, pattern, perps, tiles } = segmentData;
   let { col, row } = segmentData;
 
+  if (!tiles) {
+    console.log(segmentData);
+    throw "!tiles";
+  }
+  
   const wordArr = word.getArray();
   const wordStr = word.getString();
   const maxIndex = wordStr.length - 1;
@@ -253,17 +259,29 @@ const getPlacements = (segment, word, blacklist) => {
 
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
+
     // TODO: this is supposed to make sure we aren't replacing tiles on the board
     // it does not appear to be working?
     index = wordStr.slice(index).search(pattern);
+
     if (index === -1) {
       continue;
     }
+
+    // TODO: test to see if an already-placed tile would be replaced by this placement
+    // if so, log some data so we can figure out what's going on
 
     start = (down ? row : col) - index;
     if (
       wordArr.some((letter, letterIndex) => {
         const perpIndex = start + letterIndex;
+
+        // TODO
+        if ([undefined, " ", letter].indexOf(tiles[perpIndex]) === -1) {
+          console.log(`tiles[${perpIndex}] (${tiles[perpIndex]}) !== letter (${letter})`);
+          throw "DEBUG STOPPER";
+        }
+
         if (perps.has(perpIndex)) {
           const { left, right } = perps.get(perpIndex);
           const maybeWord = `${left || ""}${letter}${right || ""}`;
@@ -280,14 +298,14 @@ const getPlacements = (segment, word, blacklist) => {
       row = row + start;
     }
 
-    let tiles = wordStr;
+    let tilesLeft = wordStr;
     segment.getCounts().forEach((count, letter) => {
       [...Array(count).keys()].forEach(() => {
-        tiles = tiles.replace(letter, "");
+        tilesLeft = tilesLeft.replace(letter, "");
       });
     });
-    if (tiles !== "") {
-      placements.push({ col, down, row, tilesArr: tiles.split(""), wordArr });
+    if (tilesLeft !== "") {
+      placements.push({ col, down, row, tilesArr: tilesLeft.split(""), wordArr });
     }
 
     index = lastIndex + (index || 1);
@@ -311,9 +329,10 @@ const getSegments = (str, index, down, segments, lines) => {
     perps.set(perpIndex, { left, right });
   });
   const startingSegment = { counts, down, perps };
-  getPatterns(trimmed).forEach(({ pattern, tilesLeftTrim }) => {
+  getPatterns(trimmed).forEach(({ pattern, tiles, tilesLeftTrim }) => {
     const start = tilesLeftTrim + inLeft;
     startingSegment.pattern = pattern;
+    startingSegment.tiles = tiles;
     if (down) {
       segments.push(Object.assign({ col: index, row: start }, startingSegment));
     } else {
@@ -558,6 +577,7 @@ class Segment {
           pattern: /.*/,
           perps: new Map(),
           row: 0,
+          tiles: " ",
         },
       ];
       return this;
