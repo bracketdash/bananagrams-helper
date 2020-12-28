@@ -268,7 +268,7 @@ const getPlacements = (segment, word, blacklist) => {
         if ([undefined, " ", letter].indexOf(tiles[perpIndex]) === -1) {
           console.log(`tiles[${perpIndex}] (${tiles[perpIndex]}) !== letter (${letter})`);
           throw new Error("BUG: placements that would replace tiles shouldn't have made it this far...");
-          // could we have gotten the match wrong in deciding index, etc. above?
+          // could we have gotten the math wrong in deciding index, etc. above?
           // ...or is this a necessary filter step?
         }
 
