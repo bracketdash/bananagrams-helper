@@ -255,6 +255,7 @@ const getPlacements = (segment, word, blacklist) => {
   while (index > -1 && index < maxIndex) {
     lastIndex = index;
     index = wordStr.slice(index).search(pattern);
+    console.log(`"${wordStr}".slice(index).search(${pattern}) => ${index}`);
     if (index === -1) {
       continue;
     }
@@ -263,10 +264,12 @@ const getPlacements = (segment, word, blacklist) => {
       wordArr.some((letter, letterIndex) => {
         const perpIndex = start + letterIndex;
 
-        // TODO: the String.prototype.search usage above clearly isn't working the way we had hoped...
+        // TODO
         if ([undefined, " ", letter].indexOf(tiles[perpIndex]) === -1) {
           console.log(`tiles[${perpIndex}] (${tiles[perpIndex]}) !== letter (${letter})`);
           throw new Error("BUG: placements that would replace tiles shouldn't have made it this far...");
+          // could we have gotten the match wrong in deciding index, etc. above?
+          // ...or is this a necessary filter step?
         }
 
         if (perps.has(perpIndex)) {
